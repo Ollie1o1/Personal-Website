@@ -3,69 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Personal Website</title>
+  <title>Oliver Raczka-Shue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- THEME TOGGLE SWITCH -->
-  <div class="theme-toggle-container">
-    <label class="theme-switch">
-      <input type="checkbox" id="theme-checkbox">
-      <span class="slider round"></span>
-    </label>
-  </div>
 
-  <!-- HEADER / NAV -->
-  <header class="minimal-header">
-    <div class="welcome-container">
-      <h1>Welcome to My Portfolio</h1>
-      <nav class="nav-buttons">
-        <a href="#about" class="nav-button">About Me</a>
-        <a href="#projects" class="nav-button">Projects</a>
-        <a href="#skills" class="nav-button">Skills</a>
-        <a href="#contact" class="nav-button">Contact Me</a>
-      </nav>
-    </div>
+  <header>
+    <h1>Oliver Raczka</h1>
+    <p class="subtitle">Developer · <a href="https://github.com/Ollie1o1" target="_blank" rel="noopener">GitHub</a></p>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main>
     <section id="about">
-      <h2>About Me</h2>
-      <p>I'm a passionate developer with experience in various technologies.</p>
+      <h2>About</h2>
+      <p>I'm a developer who likes building things from scratch — emulators, 3D engines, games, tools. I work across the stack but gravitate toward low-level systems programming in C, C++, and Rust. Most of my projects live on GitHub.</p>
     </section>
 
     <section id="projects">
-      <h2>My Projects</h2>
+      <h2>Projects</h2>
       <div class="project-grid">
-        <!-- Project cards go here -->
+
+        <a class="project-card" href="https://github.com/Ollie1o1/3d_shooter" target="_blank" rel="noopener">
+          <h3>3d_shooter</h3>
+          <p>A 3D shooter game built from scratch with custom rendering.</p>
+          <span class="tag tag-cpp">C++</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/better_emulator" target="_blank" rel="noopener">
+          <h3>better_emulator</h3>
+          <p>An improved emulator rewrite with better architecture and accuracy.</p>
+          <span class="tag tag-rust">Rust</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/emulator" target="_blank" rel="noopener">
+          <h3>emulator</h3>
+          <p>A hardware emulator built from the ground up in C.</p>
+          <span class="tag tag-c">C</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/imgtoascii" target="_blank" rel="noopener">
+          <h3>imgtoascii</h3>
+          <p>Converts images to ASCII art with adjustable resolution.</p>
+          <span class="tag tag-go">Go</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/crypto_mathbot" target="_blank" rel="noopener">
+          <h3>crypto_mathbot</h3>
+          <p>A bot that performs crypto-related mathematical computations.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/DataStructures" target="_blank" rel="noopener">
+          <h3>DataStructures</h3>
+          <p>Implementations of fundamental data structures in C.</p>
+          <span class="tag tag-c">C</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/pdf_converter" target="_blank" rel="noopener">
+          <h3>pdf_converter</h3>
+          <p>A tool to convert files to and from PDF format.</p>
+          <span class="tag tag-js">JavaScript</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/wizard-jumper" target="_blank" rel="noopener">
+          <h3>wizard-jumper</h3>
+          <p>A platformer game featuring a wizard character.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Chat-App" target="_blank" rel="noopener">
+          <h3>Chat-App</h3>
+          <p>A real-time chat application.</p>
+          <span class="tag tag-html">HTML</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Maze" target="_blank" rel="noopener">
+          <h3>Maze</h3>
+          <p>A maze generator and solver with visual output.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Audio-Visualizer" target="_blank" rel="noopener">
+          <h3>Audio-Visualizer</h3>
+          <p>Visualizes audio input with real-time graphics.</p>
+          <span class="tag tag-java">Java</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Flappy-Bird-Game" target="_blank" rel="noopener">
+          <h3>Flappy-Bird-Game</h3>
+          <p>A Flappy Bird clone built in Python.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Snake-Game" target="_blank" rel="noopener">
+          <h3>Snake-Game</h3>
+          <p>Classic snake game implementation.</p>
+          <span class="tag tag-c">C</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/options" target="_blank" rel="noopener">
+          <h3>options</h3>
+          <p>Options pricing and analysis tool.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/sdl-projects" target="_blank" rel="noopener">
+          <h3>sdl-projects</h3>
+          <p>Graphics projects built with SDL.</p>
+          <span class="tag tag-c">C</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/ascii-art-attempt" target="_blank" rel="noopener">
+          <h3>ascii-art-attempt</h3>
+          <p>Experiments with generating ASCII art from various inputs.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Bored-and-Curious" target="_blank" rel="noopener">
+          <h3>Bored-and-Curious</h3>
+          <p>Assorted curiosity-driven experiments and prototypes.</p>
+          <span class="tag tag-cpp">C++</span>
+        </a>
+
       </div>
     </section>
 
     <section id="skills">
       <h2>Skills</h2>
+      <h3 class="skill-category">Languages</h3>
       <div class="skills-container">
-        <!-- Skill items go here -->
+        <span class="tag tag-python">Python</span>
+        <span class="tag tag-c">C</span>
+        <span class="tag tag-cpp">C++</span>
+        <span class="tag tag-rust">Rust</span>
+        <span class="tag tag-go">Go</span>
+        <span class="tag tag-java">Java</span>
+        <span class="tag tag-js">JavaScript</span>
+        <span class="tag tag-ts">TypeScript</span>
+        <span class="tag tag-sql">SQL</span>
+        <span class="tag tag-html">HTML/CSS</span>
+      </div>
+
+      <h3 class="skill-category">Tools &amp; Frameworks</h3>
+      <div class="skills-container">
+        <span class="tag tag-tool">OpenGL</span>
+        <span class="tag tag-tool">SDL2</span>
+        <span class="tag tag-tool">Flask</span>
+        <span class="tag tag-tool">Streamlit</span>
+        <span class="tag tag-tool">NumPy/SciPy</span>
+        <span class="tag tag-tool">Docker</span>
+        <span class="tag tag-tool">Git</span>
+        <span class="tag tag-tool">Linux</span>
+        <span class="tag tag-tool">Jira</span>
+      </div>
+
+      <h3 class="skill-category">Practices</h3>
+      <div class="skills-container">
+        <span class="tag tag-practice">CI/CD (GitHub Actions)</span>
+        <span class="tag tag-practice">Agile</span>
+        <span class="tag tag-practice">TDD</span>
+        <span class="tag tag-practice">Pytest</span>
+        <span class="tag tag-practice">Unittest</span>
       </div>
     </section>
 
     <section id="contact">
-      <h2>Contact Me</h2>
-      <form id="contact-form">
-        <input type="text" placeholder="Your Name" required>
-        <input type="email" placeholder="Your Email" required>
-        <textarea placeholder="Your Message" required></textarea>
-        <button type="submit">Send</button>
-      </form>
+      <h2>Contact</h2>
+      <p class="contact-links">
+        <a href="https://github.com/Ollie1o1" target="_blank" rel="noopener">GitHub</a>
+        <span class="separator">&middot;</span>
+        <a href="https://mail.google.com/mail/?view=cm&to=oliver.raczka.shue@gmail.com" target="_blank" rel="noopener">Email</a>
+      </p>
     </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2025 My Portfolio</p>
-  </footer>
-
-  <!-- <script> MUST be here so that it can attach to the toggle and all elements on the page -->
   <script src="script.js"></script>
 </body>
 </html>
