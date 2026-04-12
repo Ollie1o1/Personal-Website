@@ -124,4 +124,130 @@ document.querySelectorAll('section').forEach((section) => {
 
   resize();
   loop();
+
+  // --- Spring cursor ---
+  if (!isTouchDevice) {
+    const dot = document.getElementById('spring-cursor');
+    let cx = 0, cy = 0, tx = 0, ty = 0;
+    document.addEventListener('mousemove', function(e) { tx = e.clientX; ty = e.clientY; dot.style.opacity = 1; });
+    document.addEventListener('mouseleave', function() { dot.style.opacity = 0; });
+    (function animateDot() {
+      cx += (tx - cx) * 0.15;
+      cy += (ty - cy) * 0.15;
+      dot.style.left = cx + 'px';
+      dot.style.top = cy + 'px';
+      requestAnimationFrame(animateDot);
+    })();
+  }
+})();
+
+// --- Language stats bar ---
+(function() {
+  const statsEl = document.querySelector('.lang-stats');
+  if (!statsEl) return;
+  let animated = false;
+  const statsObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && !animated) {
+        animated = true;
+        document.querySelectorAll('.lang-fill').forEach(function(fill) {
+          fill.style.width = fill.dataset.pct + '%';
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  statsObserver.observe(statsEl);
+})();
+
+// --- Command palette ---
+(function() {
+  const COMMANDS = [
+    { label: 'Go to About',    action: function() { document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' }); } },
+    { label: 'Go to Projects', action: function() { document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' }); } },
+    { label: 'Go to Skills',   action: function() { document.querySelector('#skills')?.scrollIntoView({ behavior: 'smooth' }); } },
+    { label: 'Go to Contact',  action: function() { document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' }); } },
+    { label: 'Open GitHub',    action: function() { window.open('https://github.com/Ollie1o1', '_blank'); } },
+  ];
+
+  const overlay = document.getElementById('palette-overlay');
+  const input = document.getElementById('palette-input');
+  const results = document.getElementById('palette-results');
+  let activeIndex = -1;
+
+  function openPalette() {
+    overlay.classList.remove('palette-hidden');
+    input.value = '';
+    activeIndex = -1;
+    renderResults('');
+    input.focus();
+  }
+
+  function closePalette() {
+    overlay.classList.add('palette-hidden');
+    input.value = '';
+  }
+
+  function renderResults(query) {
+    const filtered = query
+      ? COMMANDS.filter(function(c) { return c.label.toLowerCase().includes(query.toLowerCase()); })
+      : COMMANDS;
+    results.innerHTML = '';
+    activeIndex = -1;
+    filtered.forEach(function(cmd, i) {
+      const li = document.createElement('li');
+      li.textContent = cmd.label;
+      li.addEventListener('mouseenter', function() {
+        setActive(i);
+      });
+      li.addEventListener('click', function() {
+        cmd.action();
+        closePalette();
+      });
+      results.appendChild(li);
+    });
+  }
+
+  function setActive(index) {
+    const items = results.querySelectorAll('li');
+    items.forEach(function(li) { li.classList.remove('active'); });
+    activeIndex = index;
+    if (items[activeIndex]) items[activeIndex].classList.add('active');
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      if (overlay.classList.contains('palette-hidden')) {
+        openPalette();
+      } else {
+        closePalette();
+      }
+      return;
+    }
+    if (overlay.classList.contains('palette-hidden')) return;
+    const items = results.querySelectorAll('li');
+    if (e.key === 'Escape') {
+      closePalette();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActive(Math.min(activeIndex + 1, items.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive(Math.max(activeIndex - 1, 0));
+    } else if (e.key === 'Enter') {
+      if (items[activeIndex]) {
+        items[activeIndex].click();
+      } else if (items.length === 1) {
+        items[0].click();
+      }
+    }
+  });
+
+  input.addEventListener('input', function() {
+    renderResults(input.value);
+  });
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closePalette();
+  });
 })();

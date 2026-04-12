@@ -18,12 +18,13 @@
 
   <main>
     <section id="about">
-      <h2>About</h2>
-      <p>I'm a developer who likes building things from scratch — emulators, 3D engines, games, tools. I work across the stack but gravitate toward low-level systems programming in C, C++, and Rust. Most of my projects live on GitHub.</p>
+      <p>Hey there, I'm a Computer Science student, low level developer and curious problem solver. I have a deep passion for building software from the first line of code. My projects range from high performance 3D engines to systems level emulators, all driven by a desire to master the architecture behind the screen. I primarily work in C, C++, and Python to build tools and games that are as fast as they are functional.</p>
     </section>
 
     <section id="projects">
       <h2>Projects</h2>
+
+      <h3 class="project-group-label">Most Proud</h3>
       <div class="project-grid">
 
         <a class="project-card" href="https://github.com/Ollie1o1/3d_shooter" target="_blank" rel="noopener">
@@ -49,6 +50,23 @@
           <p>Converts images to ASCII art with adjustable resolution.</p>
           <span class="tag tag-go">Go</span>
         </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/Audio-Visualizer" target="_blank" rel="noopener">
+          <h3>Audio-Visualizer</h3>
+          <p>Visualizes audio input with real-time graphics.</p>
+          <span class="tag tag-java">Java</span>
+        </a>
+
+        <a class="project-card" href="https://github.com/Ollie1o1/options" target="_blank" rel="noopener">
+          <h3>options</h3>
+          <p>Options pricing and analysis tool.</p>
+          <span class="tag tag-python">Python</span>
+        </a>
+
+      </div>
+
+      <h3 class="project-group-label other-label">Other Projects</h3>
+      <div class="project-grid project-grid--other">
 
         <a class="project-card" href="https://github.com/Ollie1o1/crypto_mathbot" target="_blank" rel="noopener">
           <h3>crypto_mathbot</h3>
@@ -86,12 +104,6 @@
           <span class="tag tag-python">Python</span>
         </a>
 
-        <a class="project-card" href="https://github.com/Ollie1o1/Audio-Visualizer" target="_blank" rel="noopener">
-          <h3>Audio-Visualizer</h3>
-          <p>Visualizes audio input with real-time graphics.</p>
-          <span class="tag tag-java">Java</span>
-        </a>
-
         <a class="project-card" href="https://github.com/Ollie1o1/Flappy-Bird-Game" target="_blank" rel="noopener">
           <h3>Flappy-Bird-Game</h3>
           <p>A Flappy Bird clone built in Python.</p>
@@ -102,12 +114,6 @@
           <h3>Snake-Game</h3>
           <p>Classic snake game implementation.</p>
           <span class="tag tag-c">C</span>
-        </a>
-
-        <a class="project-card" href="https://github.com/Ollie1o1/options" target="_blank" rel="noopener">
-          <h3>options</h3>
-          <p>Options pricing and analysis tool.</p>
-          <span class="tag tag-python">Python</span>
         </a>
 
         <a class="project-card" href="https://github.com/Ollie1o1/sdl-projects" target="_blank" rel="noopener">
@@ -147,6 +153,45 @@
         <span class="tag tag-html">HTML/CSS</span>
       </div>
 
+      <h3 class="skill-category">Languages <span class="skill-subtitle">— by project use</span></h3>
+      <div class="lang-stats">
+        <div class="lang-row">
+          <span class="lang-label">C</span>
+          <div class="lang-bar"><div class="lang-fill tag-c" data-pct="30"></div></div>
+          <span class="lang-pct">30%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">Python</span>
+          <div class="lang-bar"><div class="lang-fill tag-python" data-pct="25"></div></div>
+          <span class="lang-pct">25%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">C++</span>
+          <div class="lang-bar"><div class="lang-fill tag-cpp" data-pct="18"></div></div>
+          <span class="lang-pct">18%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">Rust</span>
+          <div class="lang-bar"><div class="lang-fill tag-rust" data-pct="10"></div></div>
+          <span class="lang-pct">10%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">Go</span>
+          <div class="lang-bar"><div class="lang-fill tag-go" data-pct="6"></div></div>
+          <span class="lang-pct">6%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">Java</span>
+          <div class="lang-bar"><div class="lang-fill tag-java" data-pct="6"></div></div>
+          <span class="lang-pct">6%</span>
+        </div>
+        <div class="lang-row">
+          <span class="lang-label">JS/HTML</span>
+          <div class="lang-bar"><div class="lang-fill tag-js" data-pct="5"></div></div>
+          <span class="lang-pct">5%</span>
+        </div>
+      </div>
+
       <h3 class="skill-category">Tools &amp; Frameworks</h3>
       <div class="skills-container">
         <span class="tag tag-tool">OpenGL</span>
@@ -179,6 +224,15 @@
       </p>
     </section>
   </main>
+
+  <div id="palette-overlay" class="palette-hidden">
+    <div id="palette">
+      <input id="palette-input" type="text" placeholder="Jump to..." autocomplete="off" />
+      <ul id="palette-results"></ul>
+    </div>
+  </div>
+
+  <div id="spring-cursor"></div>
 
   <script src="script.js"></script>
 </body>
