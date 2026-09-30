@@ -2,20 +2,95 @@
 order: 2
 title: 'NES Emulator'
 category: 'EMULATION · RUST'
-summary: 'Draft.'
-description: 'Draft.'
+summary: 'A Nintendo Entertainment System emulator in Rust. CPU, picture unit and audio unit advance in lockstep on one master clock, so real cartridges boot and play.'
+description: 'Case study: a NES emulator in Rust with a 6502 CPU, dot-level PPU, five-channel APU, three cartridge mappers, and a single-owner memory bus with no Rc<RefCell>.'
 role: 'Solo — design and implementation'
-timeline: '2026'
-stack: ['Rust']
+timeline: 'Mar 2026'
+stack: ['Rust', 'SDL2']
 repo: 'https://github.com/Ollie1o1/better_emulator'
+demo: { label: 'Play in browser (soon)' }
 stats:
-  - { k: 'a', v: '1' }
-  - { k: 'b', v: '2' }
-  - { k: 'c', v: '3' }
-  - { k: 'd', v: '4' }
+  - { k: 'PPU : CPU clock', v: '3 : 1' }
+  - { k: 'Mappers', v: '3' }
+  - { k: 'APU channels', v: '5' }
+  - { k: 'Lines of Rust', v: '3.1k' }
 asOf: '2026-09-29'
 ---
 
 ## Overview
 
-Draft.
+The NES is a good first "real" machine to emulate: small enough to hold in your head, but with three chips (a Ricoh 2A03 CPU, a picture processing unit and an audio processing unit) that have to agree on time down to the cycle, or games break in visible ways.
+
+This emulator implements the 6502 instruction set including the common unofficial opcodes, a PPU with Loopy scroll registers that renders dot by dot into a 256×240 frame, an APU with both pulse channels, triangle, noise and DMC, and three cartridge mappers (NROM, MMC1 and UxROM). Between them those cover games like Super Mario Bros, The Legend of Zelda, Mega Man and Castlevania. Battery-backed cartridge RAM is saved to disk, and it ships with six homebrew ROMs to play out of the box.
+
+## Architecture
+
+<Figure caption="Solid lines are ownership. The CPU borrows the bus mutably for each instruction; interrupts travel back through the emulator loop (amber).">
+  <svg viewBox="0 0 720 270" role="img" aria-label="The Emulator owns the CPU and the Bus. The Bus owns RAM, PPU, APU, cartridge and two controllers. The CPU borrows the Bus for each step. Interrupts from the PPU, APU and mapper are forwarded to the CPU by the emulator loop.">
+    <defs><marker id="nes-ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" class="arrow" /></marker></defs>
+    <rect x="260" y="10" width="200" height="42" rx="4" class="box-strong" />
+    <text x="276" y="30" class="t">Emulator</text><text x="276" y="45" class="td">clock() · run_frame()</text>
+    <rect x="30" y="100" width="160" height="56" rx="4" class="box-accent" />
+    <text x="46" y="123" class="t">CPU · 2A03</text><text x="46" y="142" class="td">6502 · master clock</text>
+    <rect x="270" y="100" width="180" height="56" rx="4" class="box-strong" />
+    <text x="286" y="123" class="t">Bus</text><text x="286" y="142" class="td">memory map · OAM DMA</text>
+    <rect x="530" y="66" width="170" height="38" rx="4" class="box" /><text x="546" y="90" class="t">PPU <tspan class="td">×3 per cycle</tspan></text>
+    <rect x="530" y="114" width="170" height="38" rx="4" class="box" /><text x="546" y="138" class="t">APU <tspan class="td">5 channels</tspan></text>
+    <rect x="530" y="162" width="170" height="38" rx="4" class="box" /><text x="546" y="186" class="t">Cartridge <tspan class="td">+ mapper</tspan></text>
+    <rect x="530" y="210" width="170" height="38" rx="4" class="box" /><text x="546" y="234" class="t">Controllers <tspan class="td">×2 · RAM</tspan></text>
+    <path d="M330,52 L140,96" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M360,52 V96" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M450,120 L526,85" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M450,128 L526,133" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M450,136 L526,181" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M450,144 L526,229" class="edge" marker-end="url(#nes-ar)" />
+    <path d="M110,156 V190 H360 V162" class="edge-accent" style="stroke: var(--mute)" marker-end="url(#nes-ar)" />
+    <text x="126" y="208" class="td">&amp;mut Bus, one instruction at a time</text>
+    <path d="M615,66 V31 H464" class="edge-accent" />
+    <path d="M256,31 H80 V96" class="edge-accent" />
+    <text x="480" y="24" class="ta">NMI · IRQ</text>
+    <text x="96" y="24" class="ta">nmi_pending · irq_pending</text>
+  </svg>
+</Figure>
+
+The big design decision is **ownership**. A naive Rust port of a C-style emulator ends up wrapping every component in `Rc<RefCell<…>>` so the CPU can reach the PPU and the PPU can reach the cartridge. That compiles, but it moves the borrow checker's job to runtime and hides the real data flow. Here the `Emulator` owns the CPU and a single `Bus`; the bus owns everything the CPU can address. The CPU takes `&mut Bus` for the duration of one instruction and gives it back. There are zero `RefCell`s in the codebase, so aliasing mistakes are compile errors rather than runtime panics.
+
+## Hard problems
+
+### Three chips, one clock
+
+On NTSC hardware the PPU runs exactly three dots for every CPU cycle, and the APU and mapper tick once per cycle. The emulator makes the CPU the master clock: execute one instruction, learn how many cycles it took, then advance everything else by that many cycles and collect interrupt lines on the way out.
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/emulator.rs" lines="90-116" code={"let cpu_cycles = self.cpu.step(&mut self.bus);\n\nfor _ in 0..cpu_cycles {\n    self.total_cycles += 1;\n\n    for _ in 0..3 {\n        if self.bus.ppu.tick(&mut self.bus.cartridge) {\n            frame_done = true;\n        }\n        if self.bus.ppu.nmi_occurred {\n            self.bus.ppu.nmi_occurred = false;\n            self.cpu.nmi_pending = true;\n        }\n    }\n\n    self.bus.apu.tick();\n\n    if self.bus.cartridge.irq_active() {\n        self.bus.cartridge.irq_clear();\n        self.cpu.irq_pending = true;\n    }\n\n    if self.bus.apu.frame_irq {\n        self.bus.apu.frame_irq = false;\n        self.cpu.irq_pending = true;\n    }\n}"} />
+
+Interrupts are raised by components the CPU doesn't own a reference to, so they're flags the loop reads and forwards. The same function also handles OAM DMA, which stalls the CPU while 256 bytes are copied into sprite memory (after an alignment cycle on odd clocks) while the PPU keeps running.
+
+### The NMI that only fired once
+
+In the first version, the vertical-blank interrupt fired on the first frame and never again. The PPU raises a non-maskable interrupt at the start of vertical blank, and NMI on the NES is **edge-triggered**: the CPU only sees it when the line goes from low to high. My edge detector remembered the previous level in `nmi_prev` and re-evaluated it when vblank was set, or when the game read `$2002` or wrote `$2000`, but not when the pre-render scanline *cleared* vblank. A game that didn't touch those registers during vblank left `nmi_prev` stuck high, so the next frame's rising edge was never seen.
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="194-200" code={"fn update_nmi(&mut self) {\n    let nmi = self.nmi_output && (self.status & 0x80 != 0);\n    if nmi && !self.nmi_prev {\n        self.nmi_occurred = true;\n    }\n    self.nmi_prev = nmi;\n}"} />
+
+The fix was one line in the right place: re-evaluate the edge when the pre-render scanline clears the vblank flag, so the falling edge is recorded every frame no matter what the game does.
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="289-293" code={"fn tick_prerender(&mut self, cart: &mut Cartridge) {\n    if self.dot == 1 {\n        self.status &= !0xE0; // clear vblank, sprite-zero-hit, overflow\n        self.update_nmi();    // falling edge: reset nmi_prev so next vblank re-triggers NMI\n    }"} />
+
+The same commit fixed the background pipeline's order to fetch, then render, then shift, matching hardware (render reads the shift register before it advances), and limited pre-render fetches to the dot ranges the real PPU uses.
+
+### Reading a controller the way the hardware does
+
+Controllers are read serially: the game writes 1 then 0 to a strobe register, and each subsequent read shifts out one button. My first version captured the buttons whenever strobe was written high. The real 4021 shift register reloads continuously while strobe is high and freezes on the **falling** edge, and after eight reads it returns 1s. The fix latches on the 1 → 0 transition:
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/controller/mod.rs" lines="23-31" code={"pub fn write(&mut self, val: u8) {\n    let new_strobe = val & 1 == 1;\n    // Latch on falling edge (1 \u2192 0): freeze current button state into shift register.\n    // While strobe is high the shift register is continuously refreshed; reads return A.\n    if self.strobe && !new_strobe {\n        self.shift = self.buttons;\n    }\n    self.strobe = new_strobe;\n}"} />
+
+## Results
+
+- Boots and plays NROM, MMC1 and UxROM cartridges, including the six bundled homebrew titles; battery-backed saves persist to a `.sav` file next to the ROM.
+- Presentation details that matter to how it *feels*: an 8:7 pixel aspect ratio (NES pixels aren't square), CRT-style scanlines, and a status bar with live input state, FPS and volume.
+- Two-player input, and adding a mapper is a three-step change (implement the `Mapper` trait, add an enum variant, match the iNES id).
+
+## What I'd do next
+
+- **Run it in this page.** Compile the core to WebAssembly and draw frames to a canvas, so you can play it here instead of reading about it.
+- **MMC3 (mapper 4).** It's the biggest library unlock (Super Mario Bros. 3, Mega Man 3–6, Kirby's Adventure) and needs a scanline counter clocked by the PPU's address line, which is a good test of the timing model.
+- **Automated accuracy tests.** Run nestest and the blargg test ROMs in CI and diff CPU traces against a reference log, rather than validating by playing games.
