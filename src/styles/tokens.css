@@ -4,8 +4,9 @@
   --panel: #14151a;
   --line: #24262c;
   --grid: #17181d;
-  --dim: #5d6069;
-  --mute: #8a8d96;
+  --faint: #5d6069; /* large display text & decoration only (3:1) */
+  --dim: #7c808c;
+  --mute: #9b9ea8;
   --body: #b3b6be;
   --fg: #ececef;
   --amber: #f5b83d;
@@ -20,11 +21,12 @@
   --panel: #fbfaf7;
   --line: #dedbd2;
   --grid: #eceae4;
-  --dim: #8b8d93;
-  --mute: #5f6168;
+  --faint: #86888e; /* large display text & decoration only (3:1) */
+  --dim: #67686d;
+  --mute: #505157;
   --body: #3d3f45;
   --fg: #16171a;
-  --amber: #b7791f;
+  --amber: #946219;
   --code-bg: #f7f6f2;
   --syn-keyword: #6d28d9;
   --syn-type: #0369a1;
