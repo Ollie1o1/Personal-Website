@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import site from '../site.config';
+import { socialLinks } from '../lib/links';
+import type { Command } from '../lib/palette';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+
+const commands: Command[] = [
+  { id: 'home', label: 'Home', hint: 'Page', href: '/' },
+  { id: 'work', label: 'Selected work', hint: 'Section', href: '/#work' },
+  ...work.map((w) => ({ id: w.id, label: w.data.title, hint: 'Case study', href: `/work/${w.id}/` })),
+  { id: 'experience', label: 'Experience', hint: 'Section', href: '/#experience' },
+  { id: 'stack', label: 'Stack', hint: 'Section', href: '/#stack' },
+  { id: 'resume', label: 'Resume (PDF)', hint: 'Open', href: site.resumePath },
+  ...socialLinks(site).map((l) => ({ id: l.label.toLowerCase(), label: l.label, hint: 'Link', href: l.href })),
+  { id: 'theme', label: 'Toggle theme', hint: 'Action', action: 'theme' as const },
+];
+---
+
+<dialog id="palette" aria-label="Command palette">
+  <div class="box">
+    <div class="field">
+      <span class="prompt mono" aria-hidden="true">›</span>
+      <input
+        type="text"
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="palette-list"
+        aria-autocomplete="list"
+        aria-label="Jump to"
+        placeholder="Jump to…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="mono">esc</kbd>
+    </div>
+    <ul id="palette-list" role="listbox" aria-label="Results"></ul>
+    <p class="foot mono" aria-hidden="true"><span>↑↓ navigate</span><span>↵ open</span></p>
+  </div>
+</dialog>
+<script type="application/json" id="palette-data" set:html={JSON.stringify(commands)} />
+
+<style is:global>
+  #palette {
+    margin: 14vh auto auto;
+    width: min(560px, calc(100vw - 32px));
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--fg);
+  }
+  #palette::backdrop { background: color-mix(in srgb, var(--bg) 60%, transparent); backdrop-filter: blur(3px); }
+  #palette .box {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    box-shadow: 0 24px 60px -12px rgb(0 0 0 / 0.5);
+    overflow: hidden;
+  }
+  #palette[open] .box { animation: pal-in 160ms var(--ease-out); }
+  @keyframes pal-in { from { opacity: 0; transform: translateY(-6px) scale(0.99); } }
+  #palette .field { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  #palette .prompt { color: var(--amber); }
+  #palette input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--fg); font: 400 15px var(--font-sans); }
+  #palette input::placeholder { color: var(--dim); }
+  #palette kbd { font-size: 10px; color: var(--mute); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; }
+  #palette-list { list-style: none; max-height: min(360px, 50vh); overflow-y: auto; padding: 6px; }
+  #palette-list [role='option'] {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  #palette-list [aria-selected='true'] { background: color-mix(in srgb, var(--fg) 7%, transparent); box-shadow: inset 2px 0 0 var(--amber); }
+  #palette-list .ph { font: 400 11px var(--font-mono); color: var(--mute); }
+  #palette-list .empty { padding: 14px 10px; color: var(--mute); font-size: 14px; }
+  #palette .foot { display: flex; gap: 16px; padding: 9px 16px; border-top: 1px solid var(--line); font-size: 10px; color: var(--dim); }
+</style>

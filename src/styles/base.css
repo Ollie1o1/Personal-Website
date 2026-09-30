@@ -135,3 +135,27 @@ table { border-collapse: collapse; width: 100%; }
     transition: none !important;
   }
 }
+
+/* Grid lamp: amber glow masked to the background grid lines (see scripts/lamp.ts). */
+body { position: relative; }
+:where(body > :not(.lamp, .skip-link, dialog, script)) { position: relative; z-index: 1; }
+.lamp {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms;
+  background: radial-gradient(260px circle at var(--x, -999px) var(--y, -999px), var(--amber), transparent 70%);
+  -webkit-mask-image:
+    linear-gradient(#000 1px, transparent 1px),
+    linear-gradient(90deg, #000 1px, transparent 1px);
+  mask-image:
+    linear-gradient(#000 1px, transparent 1px),
+    linear-gradient(90deg, #000 1px, transparent 1px);
+  -webkit-mask-size: var(--grid-size) var(--grid-size);
+  mask-size: var(--grid-size) var(--grid-size);
+  -webkit-mask-position: -1px -1px;
+  mask-position: -1px -1px;
+}
+.lamp.on { opacity: 0.5; }

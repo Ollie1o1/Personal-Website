@@ -19,7 +19,7 @@ import site from '../site.config';
     </nav>
 
     <div class="status-right">
-      <span class="clock" aria-hidden="true"><span class="loc">{site.location}</span><time data-clock></time></span>
+      <span class="clock" aria-hidden="true"><span class="loc">{site.location}</span><time data-clock data-tz={site.timezone}></time></span>
       <button type="button" class="theme-btn" data-theme-toggle aria-label="Toggle color theme">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.25"></circle>
