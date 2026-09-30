@@ -31,6 +31,16 @@ describe('workSchema', () => {
     expect(workSchema.safeParse({ ...valid, summary: 'See my Résumé' }).success).toBe(false);
     expect(workSchema.safeParse({ ...valid, stats: [{ k: 'résume', v: '1' }, ...valid.stats.slice(1)] }).success).toBe(false);
   });
+  it('allows a demo linking to an in-page anchor or site path', () => {
+    expect(workSchema.safeParse({ ...valid, demo: { label: 'Play', href: '#play' } }).success).toBe(true);
+    expect(workSchema.safeParse({ ...valid, demo: { label: 'Play', href: '/work/x/#play' } }).success).toBe(true);
+    expect(workSchema.safeParse({ ...valid, demo: { label: 'Play', href: 'https://example.com' } }).success).toBe(true);
+  });
+
+  it('rejects a demo href that is not a URL, path or anchor', () => {
+    expect(workSchema.safeParse({ ...valid, demo: { label: 'Play', href: 'play.html' } }).success).toBe(false);
+  });
+
   it('allows a demo with no href (rendered disabled)', () => {
     expect(workSchema.safeParse({ ...valid, demo: { label: 'Play in browser (soon)' } }).success).toBe(true);
   });

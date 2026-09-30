@@ -42,9 +42,15 @@ const repoPath = d.repo.replace('https://github.com/', '');
             {
               d.demo &&
                 (d.demo.href ? (
-                  <a href={d.demo.href} target="_blank" rel="noopener">
-                    {d.demo.label} <span aria-hidden="true">↗</span>
-                  </a>
+                  /^https?:/.test(d.demo.href) ? (
+                    <a href={d.demo.href} target="_blank" rel="noopener">
+                      {d.demo.label} <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    <a href={d.demo.href}>
+                      {d.demo.label} <span aria-hidden="true">↓</span>
+                    </a>
+                  )
                 ) : (
                   <span class="disabled" aria-disabled="true">
                     {d.demo.label}

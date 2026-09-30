@@ -33,7 +33,12 @@ async function resolves(url) {
 }
 
 const errors = [];
-const files = (await walk(DIST)).filter((f) => f.endsWith('.html'));
+// Embedded game builds ship their own standalone HTML shell (loaded in an
+// iframe); they aren't site pages, so page-level SEO/content rules don't apply.
+const EMBEDS = ['overdrive/'];
+const files = (await walk(DIST)).filter(
+  (f) => f.endsWith('.html') && !EMBEDS.some((e) => relative(DIST, f).startsWith(e)),
+);
 if (files.length === 0) {
   console.error('verify-dist: no pages found in dist/ — did the build fail?');
   process.exit(1);

@@ -8,6 +8,13 @@ import Telemetry from './Telemetry.astro';
     <p class="eyebrow"><span class="dot" aria-hidden="true"></span>{site.availability}</p>
     <h1 id="hero-title">{site.name}<span>{site.title}</span></h1>
     <p class="tagline">{site.tagline}</p>
+    <p class="try mono">
+      <span class="tri" aria-hidden="true">▶</span> Play:
+      <a href="/work/overdrive/#play">OVERDRIVE</a>
+      <span aria-hidden="true">·</span>
+      <a href="/work/nes-emulator/#play">NES emulator</a>
+      <span class="dim">in the browser, via WebAssembly</span>
+    </p>
     <div class="ctas">
       <a class="btn btn-primary" href={site.resumePath} download="OliverRaczka_Resume.pdf">Resume (PDF) <span aria-hidden="true">↓</span></a>
       <a class="btn" href={site.github} target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
@@ -55,6 +62,11 @@ import Telemetry from './Telemetry.astro';
   }
   h1 span { display: block; color: var(--faint); }
   .tagline { max-width: 34em; font-size: clamp(16px, 1.6vw, 17px); color: var(--body); }
+  .try { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 14px; font-size: 12px; color: var(--mute); }
+  .try .tri { color: var(--amber); font-size: 10px; }
+  .try a { color: var(--amber); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--amber) 40%, transparent); text-underline-offset: 3px; }
+  .try a:hover { text-decoration-color: var(--amber); }
+  .try .dim { color: var(--dim); }
   .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
   .btn {
     display: inline-flex;

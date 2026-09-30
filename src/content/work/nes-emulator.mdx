@@ -2,38 +2,42 @@
 order: 2
 title: 'NES Emulator'
 category: 'EMULATION · RUST'
-summary: 'A Nintendo Entertainment System emulator in Rust. CPU, picture unit and audio unit advance in lockstep on one master clock, so real cartridges boot and play.'
-description: 'Case study: a NES emulator in Rust with a 6502 CPU, dot-level PPU, five-channel APU, three cartridge mappers, and a single-owner memory bus with no Rc<RefCell>.'
+summary: 'A Nintendo Entertainment System emulator in Rust, checked against the standard accuracy test ROMs and compiled to WebAssembly so it runs right here on the page.'
+description: 'Case study: a NES emulator in Rust with a cycle-exact 6502, dot-level PPU, five-channel APU and six mappers including MMC3, validated against nestest and blargg test ROMs, and playable in the browser via a 72 KB WebAssembly build.'
 role: 'Solo — design and implementation'
-timeline: 'Mar 2026'
-stack: ['Rust', 'SDL2']
+timeline: 'Mar – Sep 2026'
+stack: ['Rust', 'WebAssembly', 'SDL2']
 repo: 'https://github.com/Ollie1o1/better_emulator'
-demo: { label: 'Play in browser (soon)' }
+demo: { label: 'Play it on this page', href: '#play' }
 stats:
-  - { k: 'PPU : CPU clock', v: '3 : 1' }
-  - { k: 'Mappers', v: '3' }
-  - { k: 'APU channels', v: '5' }
-  - { k: 'Lines of Rust', v: '3.1k' }
-asOf: '2026-09-29'
+  - { k: 'Test ROMs passed', v: '11 / 13', accent: true }
+  - { k: 'Mappers', v: '6' }
+  - { k: 'WASM build', v: '72 KB' }
+  - { k: 'Lines of Rust', v: '3.7k' }
+asOf: '2026-09-30'
 ---
+
+<NesPlayer />
 
 ## Overview
 
 The NES is a good first "real" machine to emulate: small enough to hold in your head, but with three chips (a Ricoh 2A03 CPU, a picture processing unit and an audio processing unit) that have to agree on time down to the cycle, or games break in visible ways.
 
-This emulator implements the 6502 instruction set including the common unofficial opcodes, a PPU with Loopy scroll registers that renders dot by dot into a 256×240 frame, an APU with both pulse channels, triangle, noise and DMC, and three cartridge mappers (NROM, MMC1 and UxROM). Between them those cover games like Super Mario Bros, The Legend of Zelda, Mega Man and Castlevania. Battery-backed cartridge RAM is saved to disk, and it ships with six homebrew ROMs to play out of the box.
+This emulator implements all 256 opcodes of the 2A03's 6502 core, official and unofficial, with their hardware side effects. The PPU renders dot by dot into a 256×240 frame using Loopy scroll registers. The APU has both pulse channels, triangle, noise and the DMC sample channel. Six cartridge mappers (NROM, MMC1, UxROM, CNROM, MMC3 and AxROM) cover most of the licensed library, from Super Mario Bros. to Super Mario Bros. 3 and Kirby's Adventure.
+
+The core has no platform dependencies, so the same crate drives two frontends. One is a desktop app on SDL2. The other is the WebAssembly build above: 72 KB, no wasm-bindgen, with a small JavaScript player that handles frame pacing, audio and input.
 
 ## Architecture
 
-<Figure caption="Solid lines are ownership. The CPU borrows the bus mutably for each instruction; interrupts travel back through the emulator loop (amber).">
-  <svg viewBox="0 0 720 270" role="img" aria-label="The Emulator owns the CPU and the Bus. The Bus owns RAM, PPU, APU, cartridge and two controllers. The CPU borrows the Bus for each step. Interrupts from the PPU, APU and mapper are forwarded to the CPU by the emulator loop.">
+<Figure caption="Solid lines are ownership. The CPU borrows the bus mutably for each instruction, and every bus access clocks the PPU and APU. Interrupt lines are polled back through the emulator loop (amber).">
+  <svg viewBox="0 0 720 270" role="img" aria-label="The Emulator owns the CPU and the Bus. The Bus owns RAM, PPU, APU, cartridge and two controllers, and advances the PPU and APU on every CPU memory access. The CPU borrows the Bus for each step. Interrupts from the PPU, APU and mapper are polled by the emulator loop and forwarded to the CPU.">
     <defs><marker id="nes-ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" class="arrow" /></marker></defs>
     <rect x="260" y="10" width="200" height="42" rx="4" class="box-strong" />
     <text x="276" y="30" class="t">Emulator</text><text x="276" y="45" class="td">clock() · run_frame()</text>
     <rect x="30" y="100" width="160" height="56" rx="4" class="box-accent" />
     <text x="46" y="123" class="t">CPU · 2A03</text><text x="46" y="142" class="td">6502 · master clock</text>
     <rect x="270" y="100" width="180" height="56" rx="4" class="box-strong" />
-    <text x="286" y="123" class="t">Bus</text><text x="286" y="142" class="td">memory map · OAM DMA</text>
+    <text x="286" y="123" class="t">Bus</text><text x="286" y="142" class="td">memory map · clocks per access</text>
     <rect x="530" y="66" width="170" height="38" rx="4" class="box" /><text x="546" y="90" class="t">PPU <tspan class="td">×3 per cycle</tspan></text>
     <rect x="530" y="114" width="170" height="38" rx="4" class="box" /><text x="546" y="138" class="t">APU <tspan class="td">5 channels</tspan></text>
     <rect x="530" y="162" width="170" height="38" rx="4" class="box" /><text x="546" y="186" class="t">Cartridge <tspan class="td">+ mapper</tspan></text>
@@ -49,48 +53,75 @@ This emulator implements the 6502 instruction set including the common unofficia
     <path d="M615,66 V31 H464" class="edge-accent" />
     <path d="M256,31 H80 V96" class="edge-accent" />
     <text x="480" y="24" class="ta">NMI · IRQ</text>
-    <text x="96" y="24" class="ta">nmi_pending · irq_pending</text>
+    <text x="96" y="24" class="ta">nmi_polled · irq_polled</text>
   </svg>
 </Figure>
 
 The big design decision is **ownership**. A naive Rust port of a C-style emulator ends up wrapping every component in `Rc<RefCell<…>>` so the CPU can reach the PPU and the PPU can reach the cartridge. That compiles, but it moves the borrow checker's job to runtime and hides the real data flow. Here the `Emulator` owns the CPU and a single `Bus`; the bus owns everything the CPU can address. The CPU takes `&mut Bus` for the duration of one instruction and gives it back. There are zero `RefCell`s in the codebase, so aliasing mistakes are compile errors rather than runtime panics.
 
+## Accuracy
+
+Playing games is a weak test: most bugs only show up in one title, three levels in. So the repository runs the community-standard test ROMs as `cargo test`. Each one exercises the hardware and reports its own verdict, either in memory at `$6000` or, for nestest, as a trace diffed against a golden log.
+
+| Test ROM | What it checks | Result |
+|---|---|---|
+| nestest | Every opcode's registers **and cycle count**, diffed against an 8,991-line reference log | Matches every line |
+| blargg instr_test (official + all) | Behaviour of all 256 opcodes | Pass |
+| blargg instr_misc | Dummy reads on page crossing | Pass |
+| blargg apu_test | Length counters, frame IRQ timing and jitter, DMC (8 subtests) | Pass |
+| blargg ppu_open_bus, oam_read | PPU I/O latch and its decay; sprite memory | Pass |
+| blargg mmc3_test 1, 2, 3, 5 | MMC3 IRQ counter, A12 clocking | Pass |
+| blargg mmc3_test 4 | The exact dot an MMC3 IRQ fires | Partial (8 of 10 checks) |
+| blargg ppu_vbl_nmi | VBL flag and NMI timing to the PPU dot | Partial (4 of 10) |
+
+The two partial results have one cause, which I understand but haven't fixed. The CPU advances the PPU three dots per memory access rather than interleaving at single-dot granularity, so NMI and MMC3 interrupts can land a dot or two early. Games can't see that. These tests can, so they're marked as known gaps in the suite rather than hidden.
+
+Getting from the first run (2 of 9 suites) to here found real bugs a player would eventually have hit. Twelve unofficial opcodes fell through to a no-op. DMC sample playback never fetched from memory, so it was silent. Reading `$4015` didn't acknowledge the frame interrupt. And a 120 Hz display ran every game at double speed, because frames were paced by vsync.
+
 ## Hard problems
 
 ### Three chips, one clock
 
-On NTSC hardware the PPU runs exactly three dots for every CPU cycle, and the APU and mapper tick once per cycle. The emulator makes the CPU the master clock: execute one instruction, learn how many cycles it took, then advance everything else by that many cycles and collect interrupt lines on the way out.
+On NTSC hardware the PPU runs exactly three dots for every CPU cycle, and the APU ticks once per cycle. The first version made the CPU the master clock at instruction granularity: run a whole instruction, then advance everything else by however many cycles it took. That's simple, and it's wrong in a way games notice. An instruction that reads the PPU status register at `$2002` sees the PPU as it was *before* the instruction started, several dots in the past.
 
-<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/emulator.rs" lines="90-116" code={"let cpu_cycles = self.cpu.step(&mut self.bus);\n\nfor _ in 0..cpu_cycles {\n    self.total_cycles += 1;\n\n    for _ in 0..3 {\n        if self.bus.ppu.tick(&mut self.bus.cartridge) {\n            frame_done = true;\n        }\n        if self.bus.ppu.nmi_occurred {\n            self.bus.ppu.nmi_occurred = false;\n            self.cpu.nmi_pending = true;\n        }\n    }\n\n    self.bus.apu.tick();\n\n    if self.bus.cartridge.irq_active() {\n        self.bus.cartridge.irq_clear();\n        self.cpu.irq_pending = true;\n    }\n\n    if self.bus.apu.frame_irq {\n        self.bus.apu.frame_irq = false;\n        self.cpu.irq_pending = true;\n    }\n}"} />
+Now the clock lives in the bus. Every CPU memory access first advances the rest of the machine by one CPU cycle, and cycles with no bus access are made up after the instruction.
 
-Interrupts are raised by components the CPU doesn't own a reference to, so they're flags the loop reads and forwards. The same function also handles OAM DMA, which stalls the CPU while 256 bytes are copied into sprite memory (after an alignment cycle on odd clocks) while the PPU keeps running.
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/bus.rs" lines="70-98" code={"fn tick_components(&mut self) {\n    self.nmi_polled = self.nmi_pending;\n    self.irq_polled = self.irq_line();\n    self.cycles += 1;\n    self.cartridge.cpu_cycle = self.cycles;\n    for _ in 0..3 {\n        if self.ppu.tick(&mut self.cartridge) {\n            self.frame_complete = true;\n        }\n        if self.ppu.nmi_occurred {\n            self.ppu.nmi_occurred = false;\n            self.nmi_pending = true;\n        }\n    }\n    self.apu.tick();\n}\n\n/// Level of the shared /IRQ line (APU frame counter, DMC, mapper).\npub fn irq_line(&self) -> bool {\n    self.apu.irq() || self.cartridge.irq_active()\n}\n\n/// CPU read: one bus cycle.\npub fn cpu_read(&mut self, addr: u16) -> u8 {\n    self.tick();\n    let val = self.read_no_tick(addr);\n    self.open_bus = val;\n    val\n}"} />
+
+That only works if the CPU makes the same memory accesses the real one does, including the useless ones. A 6502 indexing across a page boundary first reads the address with the high byte not yet carried. A read-modify-write instruction like `INC` writes the *original* value back before writing the result. Both matter. The dummy read of `$2002` clears the vblank flag, and the MMC1 mapper ignores the second of two back-to-back writes, which is how games reset it with a single `INC $8000`.
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/cpu/mod.rs" lines="646-652" code={"fn rmw(&mut self, bus: &mut Bus, addr: u16, f: impl FnOnce(&mut Self, u8) -> u8) -> u8 {\n    let v = bus.cpu_read(addr);\n    bus.cpu_write(addr, v);\n    let r = f(self, v);\n    bus.cpu_write(addr, r);\n    r\n}"} />
+
+Interrupts follow the same idea. They're sampled at the start of every bus cycle, and the CPU acts on the value from before its last cycle, like the real chip. /IRQ is a level-triggered line shared by the APU and the mapper, so it stays asserted until the game acknowledges it.
+
+### MMC3 counts address lines, not scanlines
+
+MMC3 cartridges (Super Mario Bros. 3, Kirby, Mega Man 3–6) can raise an interrupt partway down the screen, which is how status bars stay still while the level scrolls. The cartridge can't see scanlines, though. It watches the PPU's address bus and counts rising edges on address line **A12**, which flips when the PPU moves from fetching background tiles to fetching sprite tiles.
+
+My first attempt called a `scanline()` hook at a fixed dot, and all five blargg MMC3 tests failed. Games also change A12 by writing addresses through `$2006` and `$2007`, and the real chip filters out edges that come too close together. The fix was to report every PPU bus address to the cartridge and detect edges the way the hardware does. The PPU also had to perform all eight sprite fetches per line, with dummy fetches for empty slots, because those dummy fetches are what make the counter tick.
+
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/cartridge/mod.rs" lines="182-192" code={"pub fn ppu_bus_address(&mut self, addr: u16, ppu_dot: u64) {\n    const MIN_LOW_DOTS: u64 = 10; // ~3 CPU cycles\n    let high = addr & 0x1000 != 0;\n    if high && !self.a12_high && ppu_dot.saturating_sub(self.a12_low_since) >= MIN_LOW_DOTS {\n        self.mapper.scanline();\n    }\n    if !high && self.a12_high {\n        self.a12_low_since = ppu_dot;\n    }\n    self.a12_high = high;\n}"} />
 
 ### The NMI that only fired once
 
-In the first version, the vertical-blank interrupt fired on the first frame and never again. The PPU raises a non-maskable interrupt at the start of vertical blank, and NMI on the NES is **edge-triggered**: the CPU only sees it when the line goes from low to high. My edge detector remembered the previous level in `nmi_prev` and re-evaluated it when vblank was set, or when the game read `$2002` or wrote `$2000`, but not when the pre-render scanline *cleared* vblank. A game that didn't touch those registers during vblank left `nmi_prev` stuck high, so the next frame's rising edge was never seen.
+In the first version, the vertical-blank interrupt fired on the first frame and never again. NMI on the NES is **edge-triggered**: the CPU only sees it when the line goes from low to high. My edge detector remembered the previous level in `nmi_prev` and re-evaluated it when vblank was set, or when the game touched `$2002` or `$2000`, but not when the pre-render scanline *cleared* vblank. A game that didn't touch those registers left `nmi_prev` stuck high, so the next frame's rising edge was never seen.
 
-<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="194-200" code={"fn update_nmi(&mut self) {\n    let nmi = self.nmi_output && (self.status & 0x80 != 0);\n    if nmi && !self.nmi_prev {\n        self.nmi_occurred = true;\n    }\n    self.nmi_prev = nmi;\n}"} />
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="264-270" code={"fn update_nmi(&mut self) {\n    let nmi = self.nmi_output && (self.status & 0x80 != 0);\n    if nmi && !self.nmi_prev {\n        self.nmi_occurred = true;\n    }\n    self.nmi_prev = nmi;\n}"} />
 
-The fix was one line in the right place: re-evaluate the edge when the pre-render scanline clears the vblank flag, so the falling edge is recorded every frame no matter what the game does.
+The fix was one line in the right place: re-evaluate the edge when the pre-render scanline clears the flag, so the falling edge is recorded every frame no matter what the game does.
 
-<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="289-293" code={"fn tick_prerender(&mut self, cart: &mut Cartridge) {\n    if self.dot == 1 {\n        self.status &= !0xE0; // clear vblank, sprite-zero-hit, overflow\n        self.update_nmi();    // falling edge: reset nmi_prev so next vblank re-triggers NMI\n    }"} />
-
-The same commit fixed the background pipeline's order to fetch, then render, then shift, matching hardware (render reads the shift register before it advances), and limited pre-render fetches to the dot ranges the real PPU uses.
-
-### Reading a controller the way the hardware does
-
-Controllers are read serially: the game writes 1 then 0 to a strobe register, and each subsequent read shifts out one button. My first version captured the buttons whenever strobe was written high. The real 4021 shift register reloads continuously while strobe is high and freezes on the **falling** edge, and after eight reads it returns 1s. The fix latches on the 1 → 0 transition:
-
-<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/controller/mod.rs" lines="23-31" code={"pub fn write(&mut self, val: u8) {\n    let new_strobe = val & 1 == 1;\n    // Latch on falling edge (1 \u2192 0): freeze current button state into shift register.\n    // While strobe is high the shift register is continuously refreshed; reads return A.\n    if self.strobe && !new_strobe {\n        self.shift = self.buttons;\n    }\n    self.strobe = new_strobe;\n}"} />
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/ppu/mod.rs" lines="365-369" code={"fn tick_prerender(&mut self, cart: &mut Cartridge) {\n    if self.dot == 1 {\n        self.status &= !0xE0; // clear vblank, sprite-zero-hit, overflow\n        self.update_nmi();    // falling edge: reset nmi_prev so next vblank re-triggers NMI\n    }"} />
 
 ## Results
 
-- Boots and plays NROM, MMC1 and UxROM cartridges, including the six bundled homebrew titles; battery-backed saves persist to a `.sav` file next to the ROM.
-- Presentation details that matter to how it *feels*: an 8:7 pixel aspect ratio (NES pixels aren't square), CRT-style scanlines, and a status bar with live input state, FPS and volume.
-- Two-player input, and adding a mapper is a three-step change (implement the `Mapper` trait, add an enum variant, match the iNES id).
+- Plays NROM, MMC1, UxROM, CNROM, MMC3 and AxROM cartridges. Battery-backed saves persist next to the ROM on desktop.
+- 11 of 13 accuracy test ROMs pass in full, and the other two are partial with the cause documented.
+- Runs in the browser from a 72 KB WebAssembly module with no wasm-bindgen: plain C-ABI exports, a canvas, an AudioWorklet for sound, and keyboard or touch input.
+- Paced to the NES's own 60.1 Hz against the wall clock in both frontends, so high-refresh displays don't speed games up.
+- A headless snapshot tool renders any frame of any ROM with scripted input, which is how the screenshots here were checked.
 
 ## What I'd do next
 
-- **Run it in this page.** Compile the core to WebAssembly and draw frames to a canvas, so you can play it here instead of reading about it.
-- **MMC3 (mapper 4).** It's the biggest library unlock (Super Mario Bros. 3, Mega Man 3–6, Kirby's Adventure) and needs a scanline counter clocked by the PPU's address line, which is a good test of the timing model.
-- **Automated accuracy tests.** Run nestest and the blargg test ROMs in CI and diff CPU traces against a reference log, rather than validating by playing games.
+- **Single-dot CPU/PPU interleaving.** It closes the last two test gaps (NMI and MMC3 IRQ timing). It means splitting each bus access into its two half-cycles.
+- **Save states.** Serialize the whole `Bus` so the browser build can suspend and resume a game across visits.
+- **More mappers.** MMC2 (Punch-Out!!) and MMC5 (Castlevania III) are the next biggest gaps.

@@ -8,14 +8,19 @@ interface Props {
 }
 
 const { entry, wide = false, index } = Astro.props;
-const { title, category, summary, stats, stack } = entry.data;
+const { title, category, summary, stats, stack, demo } = entry.data;
+// A case study with an in-page demo link has a playable build embedded
+const playable = !!demo?.href && demo.href.startsWith('#');
 const num = String(entry.data.order).padStart(2, '0');
 const notes = stats.filter((s) => s.note);
 ---
 
 <a href={`/work/${entry.id}/`} class:list={['panel', 'reveal', { wide }]} style={`--i:${index}`}>
   <div class="text">
-    <p class="label">{num} / {category}</p>
+    <p class="label">
+      {num} / {category}
+      {playable && <span class="play mono"><span class="dot" aria-hidden="true"></span>Playable in browser</span>}
+    </p>
     <h3>{title}</h3>
     <p class="sum">{summary}</p>
     {!wide && <p class="tags mono">{stack.join(' · ')}</p>}
@@ -80,7 +85,23 @@ const notes = stats.filter((s) => s.note);
     gap: 32px;
   }
   .text { display: flex; flex-direction: column; height: 100%; }
-  .label { font-size: 10px; color: var(--dim); }
+  .label { display: flex; align-items: center; gap: 10px; font-size: 10px; color: var(--dim); }
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 2px 8px;
+    border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line));
+    border-radius: 999px;
+    color: var(--amber);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .play .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); animation: blink 2.4s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  @media (prefers-reduced-motion: reduce) { .play .dot { animation: none; } }
   h3 { margin: 10px 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
   .wide h3 { font-size: clamp(26px, 3.4vw, 32px); letter-spacing: -0.03em; }
   .sum { color: var(--body); font-size: 14px; line-height: 1.6; max-width: 36em; }

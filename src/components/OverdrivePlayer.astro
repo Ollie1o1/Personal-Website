@@ -1,0 +1,162 @@
+---
+// OVERDRIVE compiled to WebAssembly + WebGL2 with Emscripten (public/overdrive/,
+// synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). The ~1.5 MB game
+// only loads when asked for, inside an iframe so its keyboard and pointer-lock
+// handling stay isolated from the page.
+---
+
+<section class="od" id="play" aria-label="Playable OVERDRIVE build">
+  <header class="bar mono">
+    <span class="lamp" aria-hidden="true"></span>
+    <span data-od-state>OVERDRIVE · not loaded</span>
+    <span class="spacer"></span>
+    <span class="dim">C++ → WebAssembly + WebGL2 · 1.5 MB</span>
+  </header>
+
+  <div class="stage" data-od-stage>
+    <img src="/work/overdrive-arena.jpg" width="960" height="540" alt="" loading="lazy" />
+    <button type="button" class="launch mono" data-od-launch>
+      <span class="tri" aria-hidden="true">▶</span>
+      <span>Load and play in the browser</span>
+      <span class="size">1.5 MB · keyboard and mouse</span>
+    </button>
+    <p class="touch-note mono">OVERDRIVE needs a keyboard and mouse. Open this page on a computer to play.</p>
+  </div>
+
+  <div class="foot mono">
+    <p class="keys">
+      <kbd>WASD</kbd> move <kbd>Mouse</kbd> look <kbd>LMB</kbd> fire <kbd>RMB</kbd> grapple
+      <kbd>Space</kbd> jump <kbd>Shift</kbd> dash <kbd>G</kbd> grenade <kbd>F</kbd> parry
+      <kbd>Esc</kbd> pause
+    </p>
+    <button type="button" class="fs" data-od-fullscreen hidden>Fullscreen</button>
+  </div>
+</section>
+
+<script type="module" is:inline>
+  const root = document.getElementById('play');
+  const stage = root.querySelector('[data-od-stage]');
+  const state = root.querySelector('[data-od-state]');
+  const fsBtn = root.querySelector('[data-od-fullscreen]');
+
+  root.querySelector('[data-od-launch]').addEventListener('click', () => {
+    const frame = document.createElement('iframe');
+    frame.src = '/overdrive/index.html?play'; // straight into a run; the menu is one Esc away
+    frame.title = 'OVERDRIVE (playable)';
+    frame.allow = 'fullscreen; autoplay; pointer-lock';
+    frame.allowFullscreen = true;
+    stage.replaceChildren(frame);
+    root.classList.add('live');
+    state.textContent = 'OVERDRIVE · loaded — click the game to start';
+    fsBtn.hidden = false;
+    frame.addEventListener('load', () => frame.focus());
+  });
+
+  // The game shell posts a message once the player has clicked in
+  window.addEventListener('message', (e) => {
+    if (e.origin === location.origin && e.data?.overdrive === 'running') state.textContent = 'OVERDRIVE · running';
+  });
+
+  fsBtn.addEventListener('click', () => stage.querySelector('iframe')?.requestFullscreen?.());
+</script>
+
+<style>
+  .od {
+    margin: 8px 0 36px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .bar .spacer { flex: 1; }
+  .bar .dim { color: var(--dim); }
+  .lamp { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); transition: background 200ms, box-shadow 200ms; }
+  .live .lamp { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+  .stage { position: relative; aspect-ratio: 16 / 9; background: #000; }
+  .stage img, .stage :global(iframe) { display: block; width: 100%; height: 100%; border: 0; }
+  .stage img { object-fit: cover; filter: saturate(0.9) brightness(0.8); }
+  .launch {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 8px;
+    width: 100%;
+    border: 0;
+    background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.7));
+    color: #ececef;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .launch .tri {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 50%;
+    font-size: 18px;
+    transition: border-color 150ms, color 150ms, transform 250ms var(--ease-out);
+  }
+  .launch:hover .tri, .launch:focus-visible .tri { border-color: #f5b83d; color: #f5b83d; transform: scale(1.06); }
+  .launch .size { font-size: 10.5px; color: #9b9ea8; letter-spacing: 0.04em; }
+  .touch-note { display: none; }
+
+  .foot { display: flex; align-items: center; gap: 12px; padding: 10px 14px 12px; }
+  .keys { margin: 0; flex: 1; font-size: 11px; color: var(--dim); line-height: 2; }
+  kbd {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--bg);
+    font: inherit;
+    color: var(--mute);
+  }
+  kbd:first-child { margin-left: 0; }
+  .fs {
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--body);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .fs:hover { border-color: var(--mute); color: var(--fg); }
+
+  /* Phones and tablets without a mouse: explain instead of offering a broken game */
+  @media (hover: none) and (pointer: coarse) {
+    .launch { display: none; }
+    .touch-note {
+      display: grid;
+      place-items: center;
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 24px;
+      background: rgb(0 0 0 / 0.6);
+      color: #ececef;
+      font-size: 12px;
+      text-align: center;
+    }
+    .keys { display: none; }
+  }
+</style>

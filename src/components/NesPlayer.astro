@@ -1,0 +1,272 @@
+---
+// Playable NES emulator: the Rust core compiled to WebAssembly (public/nes/,
+// synced from better_emulator/web/dist by scripts/sync-nes.sh).
+const games = [
+  { rom: 'thwaite', title: 'Thwaite', genre: 'missile defense', hint: 'Start, then arrows aim and Z fires' },
+  { rom: 'nova', title: 'Nova the Squirrel', genre: 'platformer', hint: 'Start, then Z jumps and X attacks' },
+  { rom: 'croom', title: 'Concentration Room', genre: 'puzzle', hint: 'Start, then arrows move and Z flips' },
+];
+---
+
+<section class="nes" id="play" aria-label="Playable NES emulator">
+  <header class="bar mono">
+    <span class="lamp" aria-hidden="true"></span>
+    <span data-nes-state>NES · idle</span>
+    <span class="spacer"></span>
+    <span class="dim">Rust → WebAssembly · 72 KB</span>
+  </header>
+
+  <div class="screen" data-nes-player tabindex="0" aria-label="Game screen. Click to focus, then use the keyboard.">
+    <canvas width="256" height="240"></canvas>
+    <button class="start mono" type="button" data-nes-start>
+      <span class="tri" aria-hidden="true">▶</span> Click to play
+    </button>
+    <p class="err mono" data-nes-error hidden></p>
+  </div>
+
+  <div class="controls">
+    <div class="games" role="radiogroup" aria-label="Game">
+      {
+        games.map((g, i) => (
+          <button
+            type="button"
+            role="radio"
+            aria-checked={i === 0 ? 'true' : 'false'}
+            data-rom={`/nes/roms/${g.rom}.nes`}
+            data-hint={g.hint}
+          >
+            <span class="g-title">{g.title}</span>
+            <span class="g-genre mono">{g.genre}</span>
+          </button>
+        ))
+      }
+    </div>
+    <div class="actions mono">
+      <button type="button" data-nes-reset>Reset</button>
+      <label class="file">Load .nes<input type="file" accept=".nes" data-nes-file /></label>
+    </div>
+  </div>
+
+  <p class="hint mono" data-nes-hint>{games[0].hint}</p>
+  <p class="keys mono">
+    <kbd>←↑↓→</kbd> d-pad <kbd>Z</kbd> A <kbd>X</kbd> B <kbd>Enter</kbd> start <kbd>Shift</kbd> select
+  </p>
+
+  <div class="touch" aria-hidden="true">
+    <div class="dpad">
+      <span></span><button data-btn="UP">▲</button><span></span>
+      <button data-btn="LEFT">◀</button><span></span><button data-btn="RIGHT">▶</button>
+      <span></span><button data-btn="DOWN">▼</button><span></span>
+    </div>
+    <div class="mid"><button data-btn="SELECT">SEL</button><button data-btn="START">START</button></div>
+    <div class="ab"><button data-btn="B">B</button><button data-btn="A">A</button></div>
+  </div>
+
+  <p class="credit mono">
+    Games are open-source homebrew (GPL-3.0); authors and source in <a href="/nes/roms/ROMS.md">ROMS.md</a>.
+    Mappers 0, 1, 2, 3, 4 and 7 are supported if you load your own.
+  </p>
+</section>
+
+<script type="module" is:inline>
+  import { createPlayer } from '/nes/nes-player.js';
+
+  const root = document.getElementById('play');
+  const $ = (sel) => root.querySelector(sel);
+  const state = $('[data-nes-state]');
+  const errBox = $('[data-nes-error]');
+  const startBtn = $('[data-nes-start]');
+  let current = $('[role=radio][aria-checked=true]');
+
+  const setState = (s, live) => {
+    state.textContent = `NES · ${s}`;
+    root.classList.toggle('live', !!live);
+  };
+  const showError = (e) => {
+    errBox.hidden = false;
+    errBox.textContent = e.message || String(e);
+    setState('error');
+  };
+
+  let player;
+  try {
+    player = await createPlayer({ canvas: $('canvas'), wasmUrl: '/nes/nes_web.wasm' });
+    await player.loadRomUrl(current.dataset.rom);
+    setState('ready');
+  } catch (e) {
+    showError(e);
+  }
+
+  async function run(load) {
+    errBox.hidden = true;
+    try {
+      await load?.();
+      await player.start();
+      startBtn.remove();
+      setState('running', true);
+    } catch (e) {
+      showError(e);
+    }
+  }
+
+  startBtn.addEventListener('click', () => run());
+
+  for (const b of root.querySelectorAll('[role=radio]')) {
+    b.addEventListener('click', () => {
+      current.setAttribute('aria-checked', 'false');
+      b.setAttribute('aria-checked', 'true');
+      current = b;
+      $('[data-nes-hint]').textContent = b.dataset.hint;
+      run(() => player.loadRomUrl(b.dataset.rom));
+    });
+  }
+  $('[data-nes-reset]').addEventListener('click', () => player?.reset());
+  $('[data-nes-file]').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    current.setAttribute('aria-checked', 'false');
+    $('[data-nes-hint]').textContent = f.name;
+    run(() => player.loadRomFile(f));
+  });
+
+  const screen = $('[data-nes-player]');
+  screen.addEventListener('dragover', (e) => e.preventDefault());
+  screen.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) run(() => player.loadRomFile(f));
+  });
+
+  // Pause when scrolled out of view, so it isn't burning CPU (or making noise) off-screen
+  new IntersectionObserver(([entry]) => {
+    if (!player || !root.classList.contains('live')) return;
+    if (entry.isIntersecting) { if (!player.running) player.start(); }
+    else if (player.running) player.pause();
+  }, { threshold: 0.15 }).observe(screen);
+
+  for (const b of root.querySelectorAll('[data-btn]')) {
+    const name = b.dataset.btn;
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); player?.press(name, true); });
+    for (const ev of ['pointerup', 'pointercancel', 'pointerleave'])
+      b.addEventListener(ev, () => player?.press(name, false));
+  }
+</script>
+
+<style>
+  .nes {
+    margin: 8px 0 36px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .bar .spacer { flex: 1; }
+  .bar .dim { color: var(--dim); }
+  .lamp {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--faint);
+    transition: background 200ms, box-shadow 200ms;
+  }
+  .live .lamp { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+  .screen {
+    position: relative;
+    aspect-ratio: 256 / 240;
+    max-height: 70vh;
+    margin: 0 auto;
+    background: #000;
+    outline: none;
+  }
+  .screen:focus-visible { box-shadow: inset 0 0 0 2px var(--amber); }
+  canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .start {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    grid-auto-flow: column;
+    gap: 10px;
+    width: 100%;
+    border: 0;
+    background: rgb(0 0 0 / 0.55);
+    color: #ececef;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .start:hover .tri, .start:focus-visible .tri { color: #f5b83d; }
+  .err { position: absolute; left: 12px; right: 12px; bottom: 12px; margin: 0; font-size: 12px; color: #ff8a7a; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    padding: 12px 14px 0;
+  }
+  .games { display: flex; flex-wrap: wrap; gap: 6px; }
+  .games button, .actions button, .file {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--body);
+    cursor: pointer;
+    transition: border-color 150ms, color 150ms;
+  }
+  .games button { display: grid; text-align: left; padding: 6px 10px; }
+  .games button:hover, .actions button:hover, .file:hover { border-color: var(--mute); color: var(--fg); }
+  .games [aria-checked='true'] { border-color: var(--amber); color: var(--fg); }
+  .g-title { font-size: 13px; font-weight: 500; }
+  .g-genre { font-size: 10px; color: var(--dim); }
+  .actions { display: flex; gap: 6px; align-items: stretch; font-size: 11px; }
+  .actions button, .file { display: grid; place-items: center; padding: 0 12px; }
+  .file input { display: none; }
+
+  .hint, .keys, .credit { margin: 0; padding: 10px 14px 0; font-size: 11px; color: var(--dim); }
+  .hint { color: var(--mute); }
+  .credit { padding-bottom: 14px; }
+  .credit a { color: var(--mute); text-decoration: underline; text-underline-offset: 2px; }
+  kbd {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--bg);
+    font: inherit;
+    color: var(--mute);
+  }
+  kbd:first-child { margin-left: 0; }
+
+  .touch { display: none; justify-content: space-between; align-items: center; padding: 14px; touch-action: none; user-select: none; }
+  @media (pointer: coarse), (hover: none) {
+    .touch { display: flex; }
+    .keys { display: none; }
+  }
+  .touch button {
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--fg);
+    font: 600 12px var(--font-mono);
+  }
+  .dpad { display: grid; grid-template-columns: repeat(3, 46px); grid-template-rows: repeat(3, 46px); }
+  .dpad button { border-radius: 6px; }
+  .mid { display: flex; gap: 6px; }
+  .mid button { height: 30px; padding: 0 10px; border-radius: 15px; font-size: 10px; }
+  .ab { display: flex; gap: 10px; }
+  .ab button { width: 54px; height: 54px; border-radius: 50%; }
+</style>

@@ -22,7 +22,16 @@ export const workSchema = z.object({
   timeline: text,
   stack: z.array(text).min(1),
   repo: z.url(),
-  demo: z.object({ label: text, href: z.url().optional() }).optional(),
+  // href: an absolute URL, or an in-site path / anchor like '#play'
+  demo: z
+    .object({
+      label: text,
+      href: z
+        .string()
+        .refine((s) => /^(https?:\/\/|\/|#)/.test(s), { message: 'demo.href must be a URL, /path or #anchor' })
+        .optional(),
+    })
+    .optional(),
   stats: z.array(statSchema).length(4),
   asOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });

@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import CaseStudy from '../../layouts/CaseStudy.astro';
 import Figure from '../../components/Figure.astro';
 import CodeRef from '../../components/CodeRef.astro';
+import NesPlayer from '../../components/NesPlayer.astro';
+import OverdrivePlayer from '../../components/OverdrivePlayer.astro';
 
 export async function getStaticPaths() {
   const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
@@ -17,5 +19,5 @@ const { Content, headings } = await render(entry);
 ---
 
 <CaseStudy entry={entry} next={next} headings={headings}>
-  <Content components={{ Figure, CodeRef }} />
+  <Content components={{ Figure, CodeRef, NesPlayer, OverdrivePlayer }} />
 </CaseStudy>

@@ -2,25 +2,28 @@
 order: 3
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: fixed-timestep physics, Quake-style movement, and a multi-pass renderer whose every texture is generated in code.'
+summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: fixed-timestep physics, Quake-style movement, and a multi-pass renderer. It also compiles to WebAssembly, so you can play it on this page.'
 description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3 with fixed 60 Hz physics, interpolated rendering, air-strafing, instanced enemies, bloom and a CRT post-process.'
 role: 'Solo — design and implementation'
-timeline: 'Mar 2026'
-stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'GLM']
+timeline: 'Mar – Sep 2026'
+stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
 repo: 'https://github.com/Ollie1o1/3d_shooter'
+demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
   - { k: 'Enemy types', v: '4' }
   - { k: 'Image files', v: '0' }
-  - { k: 'Lines of C++', v: '5.7k' }
-asOf: '2026-09-29'
+  - { k: 'Lines of C++', v: '6.1k' }
+asOf: '2026-09-30'
 ---
+
+<OverdrivePlayer />
 
 ## Overview
 
 OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons, a style meter that rewards playing aggressively, and waves of four enemy types (grunts, shooters, stalkers and flyers), each driven by a small state machine.
 
-There's no engine underneath. The game is 5.7k lines of C++17 plus about 450 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math. It builds with a Makefile on macOS and on Windows through MSYS2. I built it to learn what an engine actually does for you, and the answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
+There's no engine underneath. The game is 6.1k lines of C++17 plus about 490 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above. I built it to learn what an engine actually does for you, and the answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
 
 ## Architecture
 
@@ -60,13 +63,13 @@ Game code is organised as states (menu, gameplay) that own their systems. Collis
 
 Movement in a game like this is tuned by feel: jump height, dash distance, how much speed a grapple builds. If physics runs once per rendered frame, all of that changes with the monitor. A 144 Hz display jumps differently from a 60 Hz one. So simulation runs on a **fixed 1/60 s step**, fed by an accumulator of real elapsed time:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="621-641" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\naccumulator += elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\nconst Uint8* keys = SDL_GetKeyboardState(nullptr);\nint mouseButtons = SDL_GetMouseState(nullptr,nullptr);\nbool leftMouse  = (mouseButtons & SDL_BUTTON(1)) != 0;\nbool rightMouse = (mouseButtons & SDL_BUTTON(3)) != 0;\nbool parryKey   = keys[SDL_SCANCODE_F] != 0;\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, leftMouse, rightMouse, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="694-714" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\naccumulator += elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\nconst Uint8* keys = SDL_GetKeyboardState(nullptr);\nint mouseButtons = SDL_GetMouseState(nullptr,nullptr);\nbool leftMouse  = (mouseButtons & SDL_BUTTON(1)) != 0;\nbool rightMouse = (mouseButtons & SDL_BUTTON(3)) != 0;\nbool parryKey   = keys[SDL_SCANCODE_F] != 0;\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
 
 Two details do a lot of work here. The accumulator is **clamped at 0.25 s**, so a stall (a window drag, a breakpoint) can't make the game try to catch up on hundreds of ticks at once, the classic "spiral of death". And **hit-stop**, the brief freeze when a hit lands, is implemented by consuming ticks without simulating, so it's frame-rate independent for free.
 
 Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** the camera between the last two physics states using whatever fraction of a tick is left in the accumulator:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="1497-1501" code={"void render() override {\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="1649-1653" code={"void render() override {\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
 
 ### Movement that rewards skill
 
@@ -88,14 +91,37 @@ The frame renders to an offscreen framebuffer, with all enemies in a single inst
 
 The optional CRT pass adds barrel distortion, chromatic aberration and scanlines on top, before the HUD and the weapon view model are drawn.
 
+### Porting it to the browser
+
+The same C++ runs above as WebAssembly, drawing through WebGL2. Most of the port was small because WebGL2 is OpenGL ES 3.0, and every GL call the game makes already exists there. The differences that mattered:
+
+- **Shader dialect.** Desktop GLSL 3.30 and GLSL ES 3.00 are close, so the loader rewrites the `#version` line and adds default precision at load time, and the same `.frag` files serve both builds. ES doesn't allow implicit int-to-float conversion, so one blur shader needed explicit casts. It also bans initializers on uniforms, which the sky shader had.
+- **Who owns the loop.** A browser tab can't block in `while (running)`, so the frame body moved into an `App` struct that the desktop build calls in a loop and the web build hands to `requestAnimationFrame`. The state lives on the heap because the web `main()` returns before the first frame runs.
+- **Escape belongs to the browser.** Pressing Esc releases pointer lock before the game ever sees the key, so losing the lock mid-run now pauses the game. `P` pauses too.
+
+On an M2 MacBook it holds 60 fps in Chrome, the same as the native build at that refresh rate.
+
+### What an audit turned up
+
+Before putting the game in front of people I read it end to end, and wrote a small headless test harness for the parts that could be tested without a window. Most of what it found was invisible in a quick playtest, which is exactly why it had survived.
+
+- **Standing on a platform flickered between grounded and airborne.** Gravity is skipped while grounded, so on the next tick the player no longer overlapped the box and read as airborne, then fell a hair and landed again. It alternated every tick, so the landing sound fired about 30 times a second. A test that stands the player on a box for 120 ticks counted 60 ground-to-air transitions. After adding a ground probe (a box top within 2 cm under the feet counts as ground) it counts zero.
+- **Hitscan went through walls.** The revolver and shotgun picked the nearest enemy the ray hit and only clipped the *tracer* at the wall, so you could shoot enemies behind cover. A hit now counts only if the enemy is closer than the nearest wall along the ray.
+- **A use-after-free on every menu click.** Clicking Start ran a callback that replaced the current game state, destroying the menu while its own event handler was still running. State changes are now queued and applied between frames.
+- **Settings that did nothing.** The volume slider was saved and displayed but never reached the mixer, and the field-of-view setting was ignored on the first run because the constructor read it before it was injected.
+- **A whole enemy type that couldn't hurt you.** Stalkers had a wind-up duration configured but no attack, so they just followed you around. They now lunge with a telegraphed melee hit and knockback.
+
+`make test` runs the physics checks (grounding on floors and box tops, walking off ledges, jump arcs, wall blocking) with no GPU or window.
+
 ## Results
 
-- A complete game loop: menu, settings (including an FPS cap), data-driven levels, wave progression, style scoring, and win/death screens.
+- A complete game loop: menu, settings that persist between launches (FOV, sensitivity, volume, FPS cap, CRT filter), data-driven levels, wave progression, style scoring, a pause menu, and win/death screens.
+- Procedurally synthesized sound effects to match the procedural textures, so the repository still has no recorded or drawn assets.
 - Consistent movement across refresh rates, thanks to the fixed step and interpolation.
-- Builds and runs on macOS and Windows. Linux should be straightforward but is **untested**, and I'd rather say so than claim it.
+- Builds and runs on macOS, Windows and in the browser. It also compiles and passes its physics tests on Linux (Ubuntu 24.04), but I haven't played it on a Linux desktop, so I don't claim Linux support yet.
 
 ## What I'd do next
 
 - **Continuous collision for the grapple.** Resolution is discrete today, so at grapple speeds a thin wall could in principle be skipped in a single tick. Sweeping the player's box along its velocity would remove that risk.
-- **Linux build and CI.** Add a Linux target and a GitHub Actions build for all three platforms so "untested" becomes "tested".
+- **Touch controls for the web build.** Phones can run it but have no way to aim; twin virtual sticks would open it up to anyone visiting on mobile.
 - **GPU timing.** Add timer queries per pass to see what the ten blur passes actually cost, then try a downsampled bloom chain.
