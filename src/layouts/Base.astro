@@ -1,0 +1,48 @@
+---
+import '@fontsource/inter-tight/400.css';
+import '@fontsource/inter-tight/500.css';
+import '@fontsource/inter-tight/600.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import site from '../site.config';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('theme'); } catch (e) {}
+        var light = window.matchMedia('(prefers-color-scheme: light)').matches;
+        document.documentElement.dataset.theme =
+          saved === 'light' || saved === 'dark' ? saved : light ? 'light' : 'dark';
+        document.documentElement.classList.add('js');
+      })();
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0f1013" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f2ee" media="(prefers-color-scheme: light)" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <main id="main">
+      <slot />
+    </main>
+  </body>
+</html>

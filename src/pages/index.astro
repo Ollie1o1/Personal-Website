@@ -1,0 +1,8 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../site.config';
+---
+
+<Base title={`${site.name} · ${site.title}`} description={site.tagline}>
+  <div class="wrap"><h1>{site.name}</h1></div>
+</Base>
