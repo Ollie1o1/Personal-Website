@@ -2,20 +2,108 @@
 order: 1
 title: 'Options Screener'
 category: 'QUANT · PYTHON'
-summary: 'Draft.'
-description: 'Draft.'
-role: 'Solo — design and implementation'
-timeline: '2026'
-stack: ['Python']
+summary: 'An options research platform that prices, scores and gates thousands of contracts a scan, and refuses to show any prediction that has not passed its own out-of-sample test.'
+description: 'Case study: a 27-factor options screener in Python with Black-Scholes pricing, IV cross-validation, walk-forward calibration, and a model guard that publishes its own negative results.'
+role: 'Solo — design, research and implementation'
+timeline: 'Nov 2025 — Present'
+stack: ['Python', 'NumPy', 'Pandas', 'SciPy', 'SQLite', 'Streamlit', 'FastAPI']
 repo: 'https://github.com/Ollie1o1/options'
 stats:
-  - { k: 'a', v: '1' }
-  - { k: 'b', v: '2' }
-  - { k: 'c', v: '3' }
-  - { k: 'd', v: '4' }
+  - { k: 'Tests', v: '6,000+' }
+  - { k: 'Commits', v: '1,338' }
+  - { k: 'Scoring factors', v: '27' }
+  - { k: 'Realized', v: '+$9.2k', accent: true, note: 'discretionary trades I picked from its ranked signals, not autonomous trading' }
 asOf: '2026-09-29'
 ---
 
 ## Overview
 
-Draft.
+I started this in November 2025 as a script that ranked option contracts for a single ticker. It is now 180k lines of Python across 30 subpackages: live and archived chains from several providers, Black-Scholes pricing and Greeks, an SVI volatility smile, a 27-factor scorer whose weights shift with the VIX regime, portfolio and earnings gates, a paper-trading ledger, and four front ends (CLI, Streamlit dashboard, FastAPI service, Discord/Telegram bots) on one shared core.
+
+The part I'm proudest of isn't any of that. It's that **the system is built to tell me when it's wrong**. Every number a decision depends on is labelled as either *verifiable* (prices, IV, Greeks), *calibrated* (checked out of sample), or *experimental*, and a model that fails its own reliability test is refused at both the write side and the read side, so it can never reach a screen.
+
+## Architecture
+
+<Figure caption="Data flows left to right; the dashed amber path is the feedback loop that decides whether a model is allowed to ship.">
+  <svg viewBox="0 0 760 240" role="img" aria-label="Pipeline: data sources feed a data-quality layer, then pricing and scoring, then gates and a calibration guard, then the user-facing surfaces. Paper trades feed a walk-forward test that controls the guard.">
+    <defs><marker id="os-ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" class="arrow" /></marker></defs>
+    <rect x="10" y="20" width="150" height="96" rx="4" class="box" />
+    <text x="24" y="44" class="t">Chains</text><text x="24" y="66" class="td">Yahoo · CBOE</text><text x="24" y="82" class="td">Alpha Vantage</text><text x="24" y="98" class="td">daily chain archive</text>
+    <rect x="200" y="20" width="160" height="96" rx="4" class="box-strong" />
+    <text x="214" y="44" class="t">Data quality</text><text x="214" y="66" class="td">quote provenance</text><text x="214" y="82" class="td">freshness labels</text><text x="214" y="98" class="td">IV cross-check (BS⁻¹)</text>
+    <rect x="400" y="20" width="160" height="96" rx="4" class="box-strong" />
+    <text x="414" y="44" class="t">Pricing &amp; scoring</text><text x="414" y="66" class="td">BS · Greeks · SVI</text><text x="414" y="82" class="td">27 weighted factors</text><text x="414" y="98" class="td">VIX-regime weights</text>
+    <rect x="600" y="20" width="150" height="44" rx="4" class="box" />
+    <text x="614" y="40" class="t">Gates</text><text x="614" y="55" class="td">earnings · risk</text>
+    <rect x="600" y="76" width="150" height="40" rx="4" class="box-accent" />
+    <text x="614" y="100" class="t">Calibration guard</text>
+    <rect x="600" y="160" width="150" height="64" rx="4" class="box" />
+    <text x="614" y="180" class="t">Surfaces</text><text x="614" y="198" class="td">CLI · Streamlit</text><text x="614" y="213" class="td">FastAPI · bots</text>
+    <rect x="400" y="160" width="160" height="56" rx="4" class="box" />
+    <text x="414" y="182" class="t">Paper ledger</text><text x="414" y="200" class="td">closed paper trades</text>
+    <rect x="200" y="160" width="160" height="56" rx="4" class="box" />
+    <text x="214" y="182" class="t">Walk-forward</text><text x="214" y="200" class="td">strict time order</text>
+    <rect x="10" y="160" width="150" height="56" rx="4" class="box" />
+    <text x="24" y="182" class="t">DoltHub</text><text x="24" y="200" class="td">7 yrs EOD · backtests</text>
+    <path d="M160,68 H196" class="edge" marker-end="url(#os-ar)" />
+    <path d="M360,68 H396" class="edge" marker-end="url(#os-ar)" />
+    <path d="M560,42 H596" class="edge" marker-end="url(#os-ar)" />
+    <path d="M675,64 V72" class="edge" marker-end="url(#os-ar)" />
+    <path d="M675,116 V156" class="edge" marker-end="url(#os-ar)" />
+    <path d="M600,188 H564" class="edge" marker-end="url(#os-ar)" />
+    <path d="M400,188 H364" class="edge" marker-end="url(#os-ar)" />
+    <path d="M160,188 H196" class="edge" marker-end="url(#os-ar)" />
+    <path d="M280,160 V140 H640 V120" class="edge-accent" />
+    <text x="300" y="134" class="ta">ships only if the reliability slope clears zero</text>
+  </svg>
+</Figure>
+
+The layers are separated by how much you should trust what they produce. The left half is **descriptive**: market prices, IV rank, spreads, open interest and Greeks computed from the chain. Those are facts, subject only to data staleness. The right half is **predictive**, and nothing predictive reaches a screen without passing through the guard.
+
+## Hard problems
+
+### Not trusting the data provider
+
+Yahoo's `impliedVolatility` field is wrong often enough on illiquid strikes to poison everything downstream: Greeks, probability of profit, expected value. Rather than trust it, the screener re-solves IV from each contract's own mid price by inverting Black-Scholes with Brent's method, and adopts the solved value wherever the two disagree by more than 15%. The contract is flagged, never dropped, and the card shows the correction (`IV corrected (yahoo 72% → solved 38%)`).
+
+<CodeRef lang="python" repo="https://github.com/Ollie1o1/options" file="src/data_quality.py" lines="149-167" code={"lo, hi = 0.005, 5.0\n\ndef _f(sigma: float) -> float:\n    return float(bs_price(option_type, S, K, T, r, sigma, q)) - mp\n\ntry:\n    f_lo = _f(lo)\n    f_hi = _f(hi)\n    if not (math.isfinite(f_lo) and math.isfinite(f_hi)):\n        return None\n    if f_lo == 0.0:\n        return lo\n    if f_hi == 0.0:\n        return hi\n    # No sign change -> price is outside the achievable range (below\n    # intrinsic or above the model max): no implied vol exists.\n    if f_lo * f_hi > 0:\n        return None\n    return float(brentq(_f, lo, hi, maxiter=100, xtol=1e-10))"} />
+
+The bracket and the sign check matter more than the root-finder: a price below intrinsic, or above the model's maximum, has **no** implied volatility, and returning `None` there is the correct answer rather than a failure.
+
+Every quote also carries its source, timestamp, age and a `fresh / delayed / stale / unknown` label, so a stale quote is flagged in the output instead of being silently served.
+
+### A model that has to earn its place on the screen
+
+The original "probability of profit" on the board turned out to identify the *structure* rather than the contract: measured across 909 closed trades it barely varied inside a strategy, so it could not order anything. I replaced it with a small logistic model of *"does this position close green under the exit rules actually in force"*, trained on realised outcomes and evaluated walk-forward in strict time order.
+
+The rule for shipping it is blunt: bucket the out-of-sample predictions, regress realised win rate on predicted probability, and ship only if the slope's 95% confidence interval lies entirely above zero.
+
+<CodeRef lang="python" repo="https://github.com/Ollie1o1/options" file="src/pop_calibration.py" lines="473-500" code={"def _slope_clears_zero(x: np.ndarray, y: np.ndarray,\n                       w: np.ndarray) -> Tuple[bool, str]:\n    \"\"\"Weighted least squares; ships only if the slope's 95% CI is above 0.\"\"\"\n    sw = w.sum()\n    xb = float((w * x).sum() / sw)\n    yb = float((w * y).sum() / sw)\n    sxx = float((w * (x - xb) ** 2).sum())\n    if sxx <= 0:\n        return (False, \"slope undefined: every qualifying bucket carries the \"\n                       \"same prediction\")\n\n    slope = float((w * (x - xb) * (y - yb)).sum() / sxx)\n    intercept = yb - slope * xb\n    dof = len(x) - 2\n    if dof <= 0:\n        return (False, f\"slope {slope:.3f} but only {len(x)} buckets \u2014 too \"\n                       f\"few to put an interval on it\")\n\n    resid = y - (intercept + slope * x)\n    ss_res = float((w * resid ** 2).sum())\n    se = math.sqrt((ss_res / dof) / sxx) if ss_res > 0 else 0.0\n    t = 1.96 if dof >= 30 else _t95(dof)\n    lo, hi = slope - t * se, slope + t * se\n\n    if lo > 0:\n        return (True, f\"slope {slope:.3f}, 95% CI [{lo:.3f}, {hi:.3f}] \u2014 \"\n                      f\"clears zero on {len(x)} buckets, n={int(sw)}\")\n    return (False, f\"slope {slope:.3f}, 95% CI [{lo:.3f}, {hi:.3f}] \u2014 \""} />
+
+And the guard holds on the **read** side too. A refused artifact loads as `None`, and there is deliberately no fallback to the old number, because a silent substitution is exactly how an unvalidated score once ended up ranking the boards without anyone noticing.
+
+<CodeRef lang="python" repo="https://github.com/Ollie1o1/options" file="src/pop_calibration.py" lines="610-625" code={"def load_model(path: str = DEFAULT_MODEL_PATH) -> Optional[Model]:\n    \"\"\"The fitted model, or None if it is absent or was refused.\n\n    None for an unshipped artifact is deliberate. The guard has to hold at the\n    READ side as well as the write side, or a model that failed its own\n    reliability check still reaches a board. There is no fallback to\n    `pop_score`: a silent substitution is exactly how `quality_score` ended up\n    ranking this system's boards unnoticed.\n    \"\"\"\n    try:\n        with open(path) as fh:\n            payload = json.load(fh)\n    except Exception:\n        return None\n    if not payload.get(\"shipped\"):\n        return None"} />
+
+### Keeping myself honest about the ranking
+
+The tempting mistake in a project like this is to test a ranking rule on trades that the same rule selected. To avoid it, the paper book enters trades **at random among contracts that survive the gates**, so the pick at the top of the board and the trade the book takes are deliberately different things. Whether expected value actually orders the board is a **pre-registered** test with a fixed sample size and a single look, frozen until it reads out on 2026-11-19.
+
+## Results
+
+These are the project's own verdicts from its evidence snapshot (2026-08-24), measured on **paper trades**:
+
+| Question | Verdict |
+|---|---|
+| Does the book as a whole have a measured edge? | **No.** Profit factor 1.044, 95% CI [0.87, 1.24] contains 1. |
+| Which structure makes money? | **Bull put spreads, and only those:** +16.8% mean return on capital at risk, CI [+6.9%, +27.0%]. |
+| Is the calibrated probability of closing green trustworthy? | **Yes.** Reliability slope 0.572, CI [0.329, 0.815] over 612 held-out trades. |
+| Does anything predict expected profit per contract? | **No.** Both candidate models were refused by the guard and are not displayed. |
+| Does expected value order the board? | **Unknown until 2026-11-19**, by design. |
+
+Separately, and outside the tool, I've traded its signals with my own money: **+$9.2k realized** from discretionary trades I picked from its ranked output. The tool does not trade on its own, and I don't present that figure as evidence the model has an edge. The table above is that evidence, and it says the edge is narrow.
+
+## What I'd do next
+
+- **Read out the pre-registration** on 2026-11-19 and act on the result, including if it says EV doesn't order the board.
+- **Fix the within-strategy inversions.** Inside bear calls and short puts the calibrated ordering still points the wrong way on about 50 trades a side. That's reported today, not gated on, because choosing what to display from the same data that measured it would fit the display to noise.
+- **Replace model-priced backtest premiums** with the real bid/ask history the daily chain archive has been compounding since June.
