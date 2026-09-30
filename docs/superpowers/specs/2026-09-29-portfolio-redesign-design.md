@@ -18,7 +18,7 @@ lead with Oliver's strongest, verifiable work and read as the product of a caref
 
 ## Stack & hosting
 
-- **Astro 5**, fully static output, content collections with Zod-typed frontmatter.
+- **Astro 7** (current stable, 7.3.x), fully static output, content collections with Zod-typed frontmatter.
 - **Hand-written CSS** driven by custom-property tokens. No Tailwind, no UI framework.
 - **Vanilla JS islands only**, ~3 KB total: ⌘K palette, theme toggle, live clock, count-up, grid lamp, TOC scroll-spy.
 - **Fonts self-hosted** via `@fontsource` (Inter Tight, IBM Plex Mono). No runtime requests to Google.
@@ -32,7 +32,6 @@ lead with Oliver's strongest, verifiable work and read as the product of a caref
 | `/work/options-screener` | Case study |
 | `/work/nes-emulator` | Case study |
 | `/work/overdrive` | Case study |
-| `/work/risc-v` | Case study |
 | `/resume.pdf` | Copy of `~/Desktop/hello/OliverRaczka_Resume.pdf` |
 | `/404` | Styled not-found page |
 
@@ -49,14 +48,14 @@ Setting it to a URL makes it appear everywhere with no other edits.
 2. **Hero:** amber eyebrow "● Open to Summer 2027 internships"; H1 "Oliver Raczka" / dim line
    "Systems & quant engineer."; one-sentence bio; CTAs: **Resume (PDF)**, GitHub, Email.
    Right side: **Telemetry** panel with 4 cells, each labelled with exactly what it measures: Screener tests
-   **5,000+** (a grep-based floor of 5,264 `def test_`; pytest collection isn't available, so never "5,264 passing"),
-   Screener commits **1,125**, Screener LOC **159k**, Emulators built **2** (NES, RISC-V). Stamp: "as of <month year>".
+   **6,000+** (a grep-based floor: 6,058 `def test_` on 2026-09-29; pytest collection isn't available, so never "passing"),
+   Screener commits **1,338**, Screener Python LOC **180k**, Emulators built **2** (NES, RISC-V). Stamp: "as of <month year>".
    All four are re-verified against the repos before launch.
 3. **Selected work:** Options Screener as a full-width panel (description + 4-stat mini grid including
    **+$9.2k realized\*** with the footnote *"discretionary trades I picked from its ranked signals, not
-   autonomous trading"*); then NES Emulator, OVERDRIVE, RISC-V Emulator as three panels. Each links to its
+   autonomous trading"*); then NES Emulator and OVERDRIVE as two panels. Each links to its
    case study.
-4. **Also built:** single-line index: Crypto trading bot (`crypto_mathbot`), Maze RL solver (`Maze`),
+4. **Also built:** single-line index: RISC-V emulator (`emulator`, RV32I in C), Crypto trading bot (`crypto_mathbot`), Maze RL solver (`Maze`),
    img2ascii (`imgtoascii`), Audio visualizer (`Audio-Visualizer`). Each links to its GitHub repo.
 5. **Experience:** Freelance Web Developer (May 2024 — Present); Desjardins Sales Representative
    (Apr 2025 — Present); Desjardins Event Marketing Intern (Jan 2024 — Jan 2025); University of Guelph,
@@ -68,6 +67,9 @@ Setting it to a URL makes it appear everywhere with no other edits.
 **Excluded projects:** Orion (a fork, not Oliver's work), Chat-App (cut from the resume as too thin),
 Snake, Flappy Bird, wizard-jumper, pdf_converter, ascii-art-attempt, Bored-and-Curious, sdl-projects,
 DataStructures, and all coursework repos.
+
+**Why three, not four (decided 2026-09-29):** the RISC-V emulator is 657 lines in one commit; a full
+case study would overstate it, so it lives in the index.
 
 ## Case-study template
 
