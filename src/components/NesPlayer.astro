@@ -13,7 +13,7 @@ const games = [
     <span class="lamp" aria-hidden="true"></span>
     <span data-nes-state>NES · idle</span>
     <span class="spacer"></span>
-    <span class="dim">Rust → WebAssembly · 72 KB</span>
+    <span class="dim">Rust → WebAssembly · 73 KB</span>
   </header>
 
   <div class="screen" data-nes-player tabindex="0" aria-label="Game screen. Click to focus, then use the keyboard.">
@@ -90,7 +90,11 @@ const games = [
 
   let player;
   try {
-    player = await createPlayer({ canvas: $('canvas'), wasmUrl: '/nes/nes_web.wasm' });
+    player = await createPlayer({
+      canvas: $('canvas'),
+      wasmUrl: '/nes/nes_web.wasm',
+      onError: showError,
+    });
     await player.loadRomUrl(current.dataset.rom);
     setState('ready');
   } catch (e) {

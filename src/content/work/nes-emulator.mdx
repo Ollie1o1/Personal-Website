@@ -3,7 +3,7 @@ order: 2
 title: 'NES Emulator'
 category: 'EMULATION · RUST'
 summary: 'A Nintendo Entertainment System emulator in Rust, checked against the standard accuracy test ROMs and compiled to WebAssembly so it runs right here on the page.'
-description: 'Case study: a NES emulator in Rust with a cycle-exact 6502, dot-level PPU, five-channel APU and six mappers including MMC3, validated against nestest and blargg test ROMs, and playable in the browser via a 72 KB WebAssembly build.'
+description: 'Case study: a NES emulator in Rust with a cycle-exact 6502, dot-level PPU, five-channel APU and six mappers including MMC3, validated against nestest and blargg test ROMs, and playable in the browser via a 73 KB WebAssembly build.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Sep 2026'
 stack: ['Rust', 'WebAssembly', 'SDL2']
@@ -12,7 +12,7 @@ demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Test ROMs passed', v: '11 / 13', accent: true }
   - { k: 'Mappers', v: '6' }
-  - { k: 'WASM build', v: '72 KB' }
+  - { k: 'WASM build', v: '73 KB' }
   - { k: 'Lines of Rust', v: '3.7k' }
 asOf: '2026-09-30'
 ---
@@ -25,7 +25,7 @@ The NES is a good first "real" machine to emulate: small enough to hold in your 
 
 This emulator implements all 256 opcodes of the 2A03's 6502 core, official and unofficial, with their hardware side effects. The PPU renders dot by dot into a 256×240 frame using Loopy scroll registers. The APU has both pulse channels, triangle, noise and the DMC sample channel. Six cartridge mappers (NROM, MMC1, UxROM, CNROM, MMC3 and AxROM) cover most of the licensed library, from Super Mario Bros. to Super Mario Bros. 3 and Kirby's Adventure.
 
-The core has no platform dependencies, so the same crate drives two frontends. One is a desktop app on SDL2. The other is the WebAssembly build above: 72 KB, no wasm-bindgen, with a small JavaScript player that handles frame pacing, audio and input.
+The core has no platform dependencies, so the same crate drives two frontends. One is a desktop app on SDL2. The other is the WebAssembly build above: 73 KB, no wasm-bindgen, with a small JavaScript player that handles frame pacing, audio and input.
 
 ## Architecture
 
@@ -100,7 +100,7 @@ MMC3 cartridges (Super Mario Bros. 3, Kirby, Mega Man 3–6) can raise an interr
 
 My first attempt called a `scanline()` hook at a fixed dot, and all five blargg MMC3 tests failed. Games also change A12 by writing addresses through `$2006` and `$2007`, and the real chip filters out edges that come too close together. The fix was to report every PPU bus address to the cartridge and detect edges the way the hardware does. The PPU also had to perform all eight sprite fetches per line, with dummy fetches for empty slots, because those dummy fetches are what make the counter tick.
 
-<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/cartridge/mod.rs" lines="182-192" code={"pub fn ppu_bus_address(&mut self, addr: u16, ppu_dot: u64) {\n    const MIN_LOW_DOTS: u64 = 10; // ~3 CPU cycles\n    let high = addr & 0x1000 != 0;\n    if high && !self.a12_high && ppu_dot.saturating_sub(self.a12_low_since) >= MIN_LOW_DOTS {\n        self.mapper.scanline();\n    }\n    if !high && self.a12_high {\n        self.a12_low_since = ppu_dot;\n    }\n    self.a12_high = high;\n}"} />
+<CodeRef lang="rust" repo="https://github.com/Ollie1o1/better_emulator" file="src/cartridge/mod.rs" lines="193-203" code={"pub fn ppu_bus_address(&mut self, addr: u16, ppu_dot: u64) {\n    const MIN_LOW_DOTS: u64 = 10; // ~3 CPU cycles\n    let high = addr & 0x1000 != 0;\n    if high && !self.a12_high && ppu_dot.saturating_sub(self.a12_low_since) >= MIN_LOW_DOTS {\n        self.mapper.scanline();\n    }\n    if !high && self.a12_high {\n        self.a12_low_since = ppu_dot;\n    }\n    self.a12_high = high;\n}"} />
 
 ### The NMI that only fired once
 
@@ -116,7 +116,7 @@ The fix was one line in the right place: re-evaluate the edge when the pre-rende
 
 - Plays NROM, MMC1, UxROM, CNROM, MMC3 and AxROM cartridges. Battery-backed saves persist next to the ROM on desktop.
 - 11 of 13 accuracy test ROMs pass in full, and the other two are partial with the cause documented.
-- Runs in the browser from a 72 KB WebAssembly module with no wasm-bindgen: plain C-ABI exports, a canvas, an AudioWorklet for sound, and keyboard or touch input.
+- Runs in the browser from a 73 KB WebAssembly module with no wasm-bindgen: plain C-ABI exports, a canvas, an AudioWorklet for sound, and keyboard or touch input.
 - Paced to the NES's own 60.1 Hz against the wall clock in both frontends, so high-refresh displays don't speed games up.
 - A headless snapshot tool renders any frame of any ROM with scripted input, which is how the screenshots here were checked.
 
