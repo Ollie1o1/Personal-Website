@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 · Signal lost" description="That page does not exist." ogRoute="/404" noindex>
+  <section class="wrap nf">
+    <p class="code mono">404</p>
+    <h1>Signal lost.</h1>
+    <p class="msg">That page doesn't exist, or it moved. The good stuff is one jump away.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="/">Back home</a>
+      <a class="btn" href="/#work">Selected work</a>
+      <button type="button" class="btn" data-palette-open>Search <kbd class="mono" data-kbd-label>⌘K</kbd></button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-top: clamp(80px, 16vw, 160px); padding-bottom: 40px; }
+  .code { font-size: 12px; letter-spacing: 0.1em; color: var(--amber); }
+  h1 { margin: 16px 0 14px; font-size: clamp(48px, 9vw, 80px); font-weight: 600; letter-spacing: -0.045em; line-height: 1; }
+  .msg { color: var(--body); font-size: 17px; max-width: 32em; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    font: 500 12px var(--font-mono);
+  }
+  .btn:hover { border-color: var(--mute); }
+  .btn-primary { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+  kbd { font-size: 10px; color: var(--mute); }
+</style>

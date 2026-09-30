@@ -9,9 +9,20 @@ import Stack from '../components/Stack.astro';
 import site from '../site.config';
 
 const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: site.url,
+  email: `mailto:${site.email}`,
+  jobTitle: 'Computer Science student',
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of Guelph' },
+  sameAs: [site.github, site.linkedin].filter(Boolean),
+};
 ---
 
-<Base title={`${site.name} · ${site.title}`} description={site.tagline}>
+<Base title={`${site.name} · ${site.title}`} description={site.tagline} jsonLd={person}>
   <Hero />
 
   <section id="work" class="wrap sec" aria-labelledby="work-title">

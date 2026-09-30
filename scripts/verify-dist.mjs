@@ -34,6 +34,10 @@ async function resolves(url) {
 
 const errors = [];
 const files = (await walk(DIST)).filter((f) => f.endsWith('.html'));
+if (files.length === 0) {
+  console.error('verify-dist: no pages found in dist/ — did the build fail?');
+  process.exit(1);
+}
 
 for (const f of files) {
   const html = await readFile(f, 'utf8');
