@@ -1,0 +1,38 @@
+---
+import { stack } from '../data/stack';
+---
+
+<section id="stack" class="wrap sec" aria-labelledby="stack-title">
+  <div class="sec-h"><h2 id="stack-title">Stack</h2><span>by domain</span></div>
+  <div class="groups">
+    {
+      stack.map((g, i) => (
+        <div class="group reveal" style={`--i:${i}`}>
+          <h3 class="label">{g.group}</h3>
+          <ul>
+            {g.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+  .group { border-top: 1px solid var(--amber); padding-top: 12px; }
+  h3 { font-size: 10px; color: var(--dim); margin-bottom: 8px; }
+  ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  li {
+    font: 400 12px var(--font-mono);
+    color: var(--body);
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--panel);
+  }
+  @media (max-width: 860px) { .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .groups { grid-template-columns: 1fr; } }
+</style>

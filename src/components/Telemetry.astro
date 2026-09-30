@@ -1,0 +1,34 @@
+---
+import { telemetry } from '../data/telemetry';
+---
+
+<aside class="readout" aria-label="Telemetry">
+  <div class="hd label"><span>Telemetry</span><span>as of {telemetry.asOf}</span></div>
+  <dl class="grid">
+    {
+      telemetry.cells.map((c) => (
+        <div class="cell">
+          <dt class="label">{c.k}</dt>
+          <dd class="metric" data-count>{c.v}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</aside>
+
+<style>
+  .readout { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); overflow: hidden; }
+  .hd {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .cell { padding: 16px 14px 14px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .cell:nth-child(2n) { border-right: 0; }
+  .cell:nth-last-child(-n + 2) { border-bottom: 0; }
+  dt { font-size: 10px; color: var(--dim); }
+  dd { margin-top: 6px; font-size: clamp(22px, 3vw, 26px); }
+</style>

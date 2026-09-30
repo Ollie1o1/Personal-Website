@@ -1,8 +1,34 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import WorkPanel from '../components/WorkPanel.astro';
+import AlsoBuilt from '../components/AlsoBuilt.astro';
+import Experience from '../components/Experience.astro';
+import Stack from '../components/Stack.astro';
 import site from '../site.config';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <Base title={`${site.name} · ${site.title}`} description={site.tagline}>
-  <div class="wrap"><h1>{site.name}</h1></div>
+  <Hero />
+
+  <section id="work" class="wrap sec" aria-labelledby="work-title">
+    <div class="sec-h">
+      <h2 id="work-title">Selected work</h2><span>{String(work.length).padStart(2, '0')} case studies</span>
+    </div>
+    <div class="work-grid">
+      {work.map((entry, i) => <WorkPanel entry={entry} wide={i === 0} index={i} />)}
+    </div>
+  </section>
+
+  <AlsoBuilt />
+  <Experience />
+  <Stack />
 </Base>
+
+<style>
+  .work-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 640px) { .work-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,49 @@
+---
+import { experience, education } from '../data/experience';
+---
+
+<section id="experience" class="wrap sec" aria-labelledby="xp-title">
+  <div class="sec-h"><h2 id="xp-title">Experience</h2><span>2024 — now</span></div>
+  <ol class="xp">
+    {
+      experience.map((r, i) => (
+        <li class="reveal" style={`--i:${i}`}>
+          <span class="when mono">{r.when}</span>
+          <div>
+            <h3>
+              {r.org && <span class="org">{r.org} · </span>}
+              {r.title}
+            </h3>
+            <p>{r.detail}</p>
+          </div>
+        </li>
+      ))
+    }
+    <li class="reveal" style={`--i:${experience.length}`}>
+      <span class="when mono">{education.when}</span>
+      <div>
+        <h3><span class="org">{education.school} · </span>{education.degree}</h3>
+        <p><span class="label">Coursework</span> {education.coursework.join(', ')}</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<style>
+  .xp { list-style: none; }
+  li {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 4px 28px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .when { font-size: 11.5px; color: var(--mute); padding-top: 3px; }
+  h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+  .org { color: var(--mute); font-weight: 500; }
+  p { margin-top: 4px; font-size: 14px; color: var(--body); max-width: 44em; }
+  p .label { font-size: 10px; color: var(--dim); margin-right: 6px; }
+  @media (max-width: 640px) {
+    li { grid-template-columns: 1fr; }
+  }
+</style>

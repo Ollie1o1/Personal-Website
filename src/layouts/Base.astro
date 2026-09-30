@@ -7,6 +7,8 @@ import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import site from '../site.config';
+import StatusBar from '../components/StatusBar.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
@@ -41,8 +43,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <StatusBar />
     <main id="main">
       <slot />
     </main>
+    <Footer />
+    <script>
+      import '../scripts/main';
+    </script>
   </body>
 </html>

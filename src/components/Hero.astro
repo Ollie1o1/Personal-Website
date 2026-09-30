@@ -1,0 +1,76 @@
+---
+import site from '../site.config';
+import Telemetry from './Telemetry.astro';
+---
+
+<section class="wrap hero" aria-labelledby="hero-title">
+  <div class="intro">
+    <p class="eyebrow"><span class="dot" aria-hidden="true"></span>{site.availability}</p>
+    <h1 id="hero-title">{site.name}<span>{site.title}</span></h1>
+    <p class="tagline">{site.tagline}</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href={site.resumePath} download="OliverRaczka_Resume.pdf">Resume (PDF) <span aria-hidden="true">↓</span></a>
+      <a class="btn" href={site.github} target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      <a class="btn" href={`mailto:${site.email}`}>Email</a>
+    </div>
+  </div>
+  <Telemetry />
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-top: clamp(56px, 10vw, 112px);
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: 400 11px var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 60%, transparent);
+    animation: pulse 2.4s var(--ease-out) infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 55%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 8px transparent; }
+  }
+  h1 {
+    margin: 18px 0 20px;
+    font-size: clamp(44px, 8vw, 68px);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+  }
+  h1 span { display: block; color: var(--dim); }
+  .tagline { max-width: 34em; font-size: clamp(16px, 1.6vw, 17px); color: var(--body); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    font: 500 12px var(--font-mono);
+    transition: border-color 150ms, background 150ms, color 150ms;
+  }
+  .btn:hover { border-color: var(--mute); }
+  .btn-primary { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+  .btn-primary:hover { background: var(--amber); border-color: var(--amber); }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 40px; }
+  }
+</style>

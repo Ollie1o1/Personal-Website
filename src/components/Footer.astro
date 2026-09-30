@@ -1,0 +1,59 @@
+---
+import site from '../site.config';
+import { socialLinks } from '../lib/links';
+
+const links = socialLinks(site);
+---
+
+<footer id="contact" class="wrap">
+  <div class="footer">
+  <div class="cta">
+    <p class="label">Contact</p>
+    <h2>Let's build something fast.</h2>
+  </div>
+  <ul class="links">
+    {
+      links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
+          >
+            <span class="label">{l.label}</span>
+            <span class="val">{l.label === 'Email' ? site.email : l.href.replace(/^https?:\/\/(www\.)?/, '')}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="colophon mono">© 2026 {site.name} · Built with Astro · Set in Inter Tight &amp; IBM Plex Mono</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: clamp(72px, 10vw, 120px);
+    padding-top: 40px;
+    padding-bottom: 40px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px 48px;
+    align-items: end;
+  }
+  h2 {
+    margin-top: 10px;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+  .links { list-style: none; display: grid; gap: 10px; }
+  .links a { display: grid; grid-template-columns: 72px auto; align-items: baseline; gap: 12px; }
+  .val { font: 400 13px var(--font-mono); color: var(--fg); transition: color 150ms; }
+  .links a:hover .val { color: var(--amber); }
+  .colophon { grid-column: 1 / -1; font-size: 11px; color: var(--dim); }
+  @media (max-width: 720px) {
+    .footer { grid-template-columns: 1fr; }
+  }
+</style>

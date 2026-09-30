@@ -1,0 +1,110 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  wide?: boolean;
+  index: number;
+}
+
+const { entry, wide = false, index } = Astro.props;
+const { title, category, summary, stats, stack } = entry.data;
+const num = String(entry.data.order).padStart(2, '0');
+const notes = stats.filter((s) => s.note);
+---
+
+<a href={`/work/${entry.id}/`} class:list={['panel', 'reveal', { wide }]} style={`--i:${index}`}>
+  <div class="text">
+    <p class="label">{num} / {category}</p>
+    <h3>{title}</h3>
+    <p class="sum">{summary}</p>
+    {!wide && <p class="tags mono">{stack.join(' · ')}</p>}
+    <span class="more mono">Read case study <span aria-hidden="true">→</span></span>
+  </div>
+  {
+    wide && (
+      <div class="side">
+        <dl class="mini">
+          {stats.map((s) => (
+            <div>
+              <dt class="label">
+                {s.k}
+                {s.note && <span aria-hidden="true">*</span>}
+              </dt>
+              <dd class:list={['metric', { accent: s.accent }]} data-count>
+                {s.v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {notes.map((s) => (
+          <p class="note mono">* {s.note}</p>
+        ))}
+      </div>
+    )
+  }
+</a>
+
+<style>
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    overflow: hidden;
+    transition: border-color 200ms;
+  }
+  .panel::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 450ms var(--ease-out);
+  }
+  .panel:hover, .panel:focus-visible { border-color: color-mix(in srgb, var(--mute) 60%, var(--line)); }
+  .panel:hover::after, .panel:focus-visible::after { transform: scaleX(1); }
+  .panel:focus-visible { outline-offset: 2px; }
+  .wide {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 32px;
+  }
+  .text { display: flex; flex-direction: column; height: 100%; }
+  .label { font-size: 10px; color: var(--dim); }
+  h3 { margin: 10px 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .wide h3 { font-size: clamp(26px, 3.4vw, 32px); letter-spacing: -0.03em; }
+  .sum { color: var(--body); font-size: 14px; line-height: 1.6; max-width: 36em; }
+  .tags { margin-top: auto; padding-top: 18px; font-size: 11px; color: var(--mute); }
+  .more { margin-top: 16px; font-size: 12px; font-weight: 500; color: var(--amber); }
+  .wide .more { margin-top: auto; padding-top: 18px; }
+  .more span { display: inline-block; transition: transform 200ms var(--ease-out); }
+  .panel:hover .more span { transform: translateX(3px); }
+  .side { align-self: start; }
+  .mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .mini div { background: var(--bg); padding: 12px 14px; }
+  .mini dd { margin-top: 4px; font-size: 20px; }
+  .accent { color: var(--amber); }
+  .note { margin-top: 8px; font-size: 10.5px; line-height: 1.5; color: var(--mute); }
+  @media (max-width: 760px) {
+    .wide { grid-template-columns: 1fr; gap: 24px; }
+    .wide .more { padding-top: 0; }
+  }
+</style>
