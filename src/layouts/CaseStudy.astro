@@ -1,0 +1,211 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import Base from './Base.astro';
+import StatStrip from '../components/StatStrip.astro';
+import Toc from '../components/Toc.astro';
+import site from '../site.config';
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  next: CollectionEntry<'work'>;
+  headings: MarkdownHeading[];
+}
+
+const { entry, next, headings } = Astro.props;
+const d = entry.data;
+const num = (n: number) => String(n).padStart(2, '0');
+const repoPath = d.repo.replace('https://github.com/', '');
+---
+
+<Base title={`${d.title} · ${site.name}`} description={d.description}>
+  <div class="wrap">
+    <nav class="crumb mono" aria-label="Breadcrumb">
+      <a href="/">OR</a><span aria-hidden="true">/</span><a href="/#work">work</a><span aria-hidden="true">/</span><span aria-current="page">{entry.id}</span>
+      <a class="back" href="/#work">← all work</a>
+    </nav>
+
+    <header class="head">
+      <div>
+        <p class="eyebrow">{num(d.order)} / {d.category}</p>
+        <h1>{d.title}</h1>
+        <p class="sum">{d.summary}</p>
+      </div>
+      <dl class="meta">
+        <div><dt class="label">Role</dt><dd>{d.role}</dd></div>
+        <div><dt class="label">Timeline</dt><dd>{d.timeline}</dd></div>
+        <div><dt class="label">Stack</dt><dd>{d.stack.join(' · ')}</dd></div>
+        <div>
+          <dt class="label">Links</dt>
+          <dd class="links">
+            <a href={d.repo} target="_blank" rel="noopener">{repoPath} <span aria-hidden="true">↗</span></a>
+            {
+              d.demo &&
+                (d.demo.href ? (
+                  <a href={d.demo.href} target="_blank" rel="noopener">
+                    {d.demo.label} <span aria-hidden="true">↗</span>
+                  </a>
+                ) : (
+                  <span class="disabled" aria-disabled="true">
+                    {d.demo.label}
+                  </span>
+                ))
+            }
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    <StatStrip stats={d.stats} />
+    <p class="asof mono">Figures verified against the repository on {d.asOf}.</p>
+
+    <div class="body">
+      <Toc headings={headings} />
+      <article class="prose">
+        <slot />
+      </article>
+    </div>
+
+    <a class="next" href={`/work/${next.id}/`}>
+      <span class="label">Next case study</span>
+      <span class="next-title">{next.data.title} <span aria-hidden="true">→</span></span>
+      <span class="label cat">{num(next.data.order)} / {next.data.category}</span>
+    </a>
+  </div>
+</Base>
+
+<style>
+  .crumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--dim);
+  }
+  .crumb a:hover { color: var(--fg); }
+  .crumb [aria-current] { color: var(--mute); }
+  .back { margin-left: auto; color: var(--mute); }
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 56px;
+    padding: clamp(40px, 7vw, 72px) 0 36px;
+    align-items: end;
+  }
+  .eyebrow { font: 400 11px var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+  h1 {
+    margin: 14px 0 16px;
+    font-size: clamp(42px, 7.5vw, 64px);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1;
+  }
+  .sum { max-width: 32em; font-size: clamp(17px, 2vw, 20px); line-height: 1.45; color: var(--body); }
+  .meta { display: grid; gap: 14px; font-size: 13px; }
+  .meta dt { font-size: 10px; color: var(--dim); }
+  .meta dd { margin-top: 3px; color: var(--fg); }
+  .links { display: grid; gap: 4px; font-family: var(--font-mono); font-size: 12px; }
+  .links a { color: var(--amber); }
+  .links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .disabled { color: var(--dim); }
+  .asof { margin-top: 10px; font-size: 10.5px; color: var(--dim); }
+  .body {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 56px;
+    padding: clamp(48px, 7vw, 72px) 0 24px;
+  }
+  .next {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 24px;
+    align-items: end;
+    margin-top: 48px;
+    padding: 36px 0 0;
+    border-top: 1px solid var(--line);
+  }
+  .next .label { grid-column: 1 / -1; font-size: 10px; color: var(--dim); }
+  .next-title { font-size: clamp(30px, 5vw, 40px); font-weight: 600; letter-spacing: -0.035em; transition: color 150ms; }
+  .next-title span { display: inline-block; transition: transform 250ms var(--ease-out); }
+  .next:hover .next-title { color: var(--amber); }
+  .next:hover .next-title span { transform: translateX(6px); }
+  .next .cat { grid-column: 2; grid-row: 2; text-align: right; }
+  @media (max-width: 860px) {
+    .head { grid-template-columns: 1fr; gap: 28px; }
+    .meta { grid-template-columns: 1fr 1fr; }
+    .body { grid-template-columns: 1fr; }
+    .body :global(.toc) { display: none; }
+  }
+  @media (max-width: 480px) {
+    .meta { grid-template-columns: 1fr; }
+    .next .cat { display: none; }
+  }
+
+  /* Prose (rendered MDX) */
+  .prose { counter-reset: sec; max-width: 680px; min-width: 0; }
+  .prose :global(h2) {
+    counter-increment: sec;
+    margin: 56px 0 14px;
+    font-size: clamp(22px, 3vw, 26px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    scroll-margin-top: 84px;
+  }
+  .prose :global(h2:first-child) { margin-top: 0; }
+  .prose :global(h2)::before {
+    content: counter(sec, decimal-leading-zero);
+    margin-right: 12px;
+    font: 400 11px var(--font-mono);
+    color: var(--dim);
+    vertical-align: 4px;
+  }
+  .prose :global(h3) { margin: 32px 0 8px; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .prose :global(p), .prose :global(li) { font-size: 16px; line-height: 1.72; color: var(--body); }
+  .prose :global(p + p) { margin-top: 14px; }
+  .prose :global(ul), .prose :global(ol) { margin: 12px 0 12px 20px; }
+  .prose :global(li + li) { margin-top: 6px; }
+  .prose :global(strong) { color: var(--fg); font-weight: 600; }
+  .prose :global(a) { color: var(--fg); text-decoration: underline; text-decoration-color: var(--amber); text-underline-offset: 3px; }
+  .prose :global(:not(pre) > code) {
+    font: 400 0.86em var(--font-mono);
+    padding: 1px 5px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--panel);
+    color: var(--fg);
+  }
+  .prose :global(pre) {
+    padding: 16px 18px;
+    overflow-x: auto;
+    font: 400 12.5px/1.65 var(--font-mono);
+    background: var(--code-bg) !important;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .prose :global(blockquote) { margin: 20px 0; padding-left: 16px; border-left: 2px solid var(--amber); }
+  .prose :global(table) { margin: 18px 0; font-size: 14px; }
+  .prose :global(th), .prose :global(td) { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; color: var(--body); }
+  .prose :global(th) { font: 400 10px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); }
+</style>
+
+<style is:global>
+  :root {
+    --astro-code-foreground: var(--fg);
+    --astro-code-background: var(--code-bg);
+    --astro-code-token-keyword: var(--syn-keyword);
+    --astro-code-token-function: var(--syn-type);
+    --astro-code-token-constant: var(--amber);
+    --astro-code-token-string: #86c79a;
+    --astro-code-token-string-expression: #86c79a;
+    --astro-code-token-comment: var(--dim);
+    --astro-code-token-parameter: var(--fg);
+    --astro-code-token-punctuation: var(--mute);
+    --astro-code-token-link: var(--amber);
+  }
+  [data-theme='light'] {
+    --astro-code-token-string: #2f7a47;
+    --astro-code-token-string-expression: #2f7a47;
+  }
+</style>

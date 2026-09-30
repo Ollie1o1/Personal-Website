@@ -6,4 +6,7 @@ export default defineConfig({
   site: 'https://oliver-raczka.vercel.app',
   output: 'static',
   integrations: [mdx(), sitemap()],
+  markdown: {
+    shikiConfig: { theme: 'css-variables' },
+  },
 });

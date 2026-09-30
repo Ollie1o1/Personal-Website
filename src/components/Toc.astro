@@ -1,0 +1,42 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+const items = Astro.props.headings.filter((h) => h.depth === 2);
+---
+
+<nav class="toc" aria-label="On this page">
+  <p class="label">On this page</p>
+  <ol>
+    {
+      items.map((h) => (
+        <li>
+          <a href={`#${h.slug}`} data-toc={h.slug}>
+            {h.text}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .toc { position: sticky; top: 84px; align-self: start; }
+  .label { font-size: 10px; color: var(--dim); margin-bottom: 10px; }
+  ol { list-style: none; font: 400 12px/1.4 var(--font-mono); }
+  a { display: block; padding: 6px 0 6px 14px; color: var(--mute); position: relative; transition: color 150ms; }
+  a::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--amber);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 150ms, transform 200ms var(--ease-out);
+  }
+  a:hover { color: var(--fg); }
+  a[aria-current='true'] { color: var(--fg); }
+  a[aria-current='true']::before { opacity: 1; transform: none; }
+</style>

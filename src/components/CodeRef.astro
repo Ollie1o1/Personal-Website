@@ -1,0 +1,39 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  code: string;
+  lang: string;
+  repo: string;
+  file: string;
+  lines: string; // "120-138"
+}
+const { code, lang, repo, file, lines } = Astro.props;
+const [start, end] = lines.split('-');
+const href = `${repo}/blob/HEAD/${file}#L${start}${end ? `-L${end}` : ''}`;
+---
+
+<figure class="coderef">
+  <figcaption class="mono">
+    <span class="file">{file}</span>
+    <a href={href} target="_blank" rel="noopener">L{lines} <span aria-hidden="true">↗</span></a>
+  </figcaption>
+  <Code code={code.replace(/^\n+|\s+$/g, '')} lang={lang as any} theme="css-variables" />
+</figure>
+
+<style>
+  .coderef { margin: 20px 0 24px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--code-bg); }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--mute);
+    background: var(--panel);
+  }
+  .file { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  a { color: var(--amber); flex-shrink: 0; }
+  .coderef :global(pre) { margin: 0; border: 0; border-radius: 0; }
+</style>
