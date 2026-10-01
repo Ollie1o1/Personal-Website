@@ -2,8 +2,8 @@
 order: 3
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: four themed arenas and a time-trial mode, seven animated enemy types and a boss, two sniper rifles, fixed-timestep physics, Quake-style movement and a multi-pass renderer. It also compiles to WebAssembly, so you can play it on this page.'
-description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3 with four arenas, a time-trial mode, seven enemy types built as animated box rigs, a wave director, moving platforms, fixed 60 Hz physics, interpolated rendering, air-strafing, bloom and a CRT post-process.'
+summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: four themed arenas and a time-trial mode, eight animated enemy types and a boss, two sniper rifles, fixed-timestep physics, Quake-style movement and a multi-pass renderer. It also compiles to WebAssembly, so you can play it on this page.'
+description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3 with four arenas, a time-trial mode, eight enemy types built as animated box rigs, a wave director, moving platforms, fixed 60 Hz physics, interpolated rendering, air-strafing, bloom and a CRT post-process.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Sep 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -11,7 +11,7 @@ repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
-  - { k: 'Enemy types', v: '7' }
+  - { k: 'Enemy types', v: '8' }
   - { k: 'Image files', v: '0' }
   - { k: 'Lines of C++', v: '9,177' }
 asOf: '2026-10-01'
@@ -97,7 +97,11 @@ The fourth arena, the Spire, is built around height: a 26 m tower with ledges, b
 
 Lifts, sweepers and orbiting platforms connect the tiers, and you can grapple any of them. They needed almost no new machinery: a moving platform is an ordinary wall flagged as dynamic. It moves every physics tick and records how far it went. It's kept out of the spatial grid and tested every tick instead. The player remembers which wall it is standing on, and riding a platform is just adding that platform's movement before the physics step. A test sweeps every platform through two full cycles and fails if any of them ever passes through a wall.
 
-Fast mode reuses the same wave director with a flag: a section's enemies are hand-placed and appear all at once, sections chain with no intro or break, and clearing the last one lights a finish beacon instead of ending the run. A headless test runs the whole descent and checks that every placed enemy appears exactly once, exactly where it was placed.
+Fast mode reuses the same wave director with a flag. Its first version was a straight run of sections, and it played like a hallway, so I rebuilt it around how shooters pace fights: a level is a long, wide channel that starts with a **breather** (health waiting, nothing shooting) and only starts its fight when you walk into a trigger. The six levels turn left and right, climb a set of terraces, cross a void, drop down a tower floor by floor and end with a climb to a beacon. Tests check that no enemy is placed in a breather, that every fight waits for its trigger, that the route really does change direction and height, and that every placed enemy appears exactly once, exactly where it was placed.
+
+### An enemy worth parrying
+
+Parrying was in from the start, but nothing made it necessary. The Juggernaut is built around it: its armor halves bullet damage, its slow siege shells come back for 400 if you parry them, and punching its overhead smash in the last 0.4 s of the wind-up breaks it, leaving it staggered and taking double damage. The parry itself became a visible punch with a clank, a flash and a hit-stop, and its window now scales with the speed of the shot, so a sniper round is as fair to parry as a slow orb.
 
 ### A renderer with no art assets
 
@@ -139,7 +143,7 @@ Before putting the game in front of people I read it end to end, and wrote a sma
 ## Results
 
 - A complete game loop: a menu with two modes, settings that persist between launches (FOV, sensitivity, zoom sensitivity, volume, FPS cap, screen shake and more), four arenas with their own lighting, fog and procedural sky, a boss fight, a time trial with splits and saved best times, XP and weapon upgrades, checkpoint retries, style scoring, a pause menu, and victory/death screens.
-- Procedurally synthesized sound effects to match the procedural textures, so the repository still has no recorded or drawn assets.
+- Procedurally synthesized sound effects for most of the game, plus gunshots, footsteps, whooshes and the parry clank cut from public-domain (CC0) recordings by a script, each trimmed to start within a few milliseconds of the trigger.
 - Consistent movement across refresh rates, thanks to the fixed step and interpolation.
 - Builds and runs on macOS, Windows and in the browser. It also compiles and passes its physics tests on Linux (Ubuntu 24.04), but I haven't played it on a Linux desktop, so I don't claim Linux support yet.
 
