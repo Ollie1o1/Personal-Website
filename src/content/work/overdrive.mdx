@@ -2,10 +2,10 @@
 order: 3
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: four themed arenas and a time-trial mode, eight animated enemy types and a boss, two sniper rifles, fixed-timestep physics, Quake-style movement and a multi-pass renderer. It also compiles to WebAssembly, so you can play it on this page.'
-description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3 with four arenas, a time-trial mode, eight enemy types built as animated box rigs, a wave director, moving platforms, fixed 60 Hz physics, interpolated rendering, air-strafing, bloom and a CRT post-process.'
+summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine: four themed arenas, a seven-room time trial joined by boost tubes, eight animated enemy types and a boss, four weapons, a live-synthesized soundtrack, fixed-timestep physics, Quake-style movement and a renderer that scales from 720p to 4K. It also compiles to WebAssembly, so you can play it on this page.'
+description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3 with four arenas, a seven-room time trial, eight enemy types built as animated box rigs with model-accurate head hitboxes, a wave director, four difficulties, moving platforms, fixed 60 Hz physics, interpolated rendering, air-strafing, a live music synthesizer, bloom, a CRT post-process and 720p-to-4K graphics quality.'
 role: 'Solo — design and implementation'
-timeline: 'Mar – Sep 2026'
+timeline: 'Mar – Oct 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
 repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
@@ -13,17 +13,17 @@ stats:
   - { k: 'Physics rate', v: '60 Hz' }
   - { k: 'Enemy types', v: '8' }
   - { k: 'Image files', v: '0' }
-  - { k: 'Lines of C++', v: '9,177' }
-asOf: '2026-10-01'
+  - { k: 'Lines of C++', v: '11,600' }
+asOf: '2026-10-02'
 ---
 
 <OverdrivePlayer />
 
 ## Overview
 
-OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons and a style meter that rewards playing aggressively. There are two ways to play. **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, against seven enemy types that each demand a different answer, ending in a boss. **Fast** is a time trial through six long levels that turn, climb and drop, each a breather before a fight, with a run clock and splits against your best run. Kills earn XP, scaled by how stylishly you play, and levels buy weapon upgrades, including for two bolt-action sniper rifles.
+OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons and a style meter that rewards playing aggressively. There are two ways to play. **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, against seven enemy types that each demand a different answer, ending in a boss. **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, with a run clock, splits against your best run and par ranks. Kills earn XP, scaled by how stylishly you play, and levels buy weapon upgrades for a revolver, a pump shotgun and two bolt-action sniper rifles. Four difficulties change how hard enemies hit, how fast they fire and how far they lead their shots, and the soundtrack is synthesized live, building from the tubes into each fight.
 
-There's no engine underneath. The game is 9,177 lines of C++17 plus about 570 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above. I built it to learn what an engine actually does for you, and the answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
+There's no engine underneath. The game is about 11,600 lines of C++17 plus about 570 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above. I built it to learn what an engine actually does for you, and the answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
 
 ## Architecture
 
@@ -63,19 +63,19 @@ Game code is organised as states (menu, gameplay) that own their systems. Collis
 
 Movement in a game like this is tuned by feel: jump height, dash distance, how much speed a grapple builds. If physics runs once per rendered frame, all of that changes with the monitor. A 144 Hz display jumps differently from a 60 Hz one. So simulation runs on a **fixed 1/60 s step**, fed by an accumulator of real elapsed time:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="869-886" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\naccumulator += elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\nconst Uint8* keys = SDL_GetKeyboardState(nullptr);\nbool parryKey = keys[SDL_SCANCODE_F] != 0;\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="941-961" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\naccumulator += elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\nconst Uint8* keys = SDL_GetKeyboardState(nullptr);\nstatic Uint8 noKeys[SDL_NUM_SCANCODES] = {};\nif (g_devNoMouse) keys = noKeys;   // screenshot runs: the real keyboard doesn't reach the game\nbool parryKey = keys[SDL_SCANCODE_F] != 0;\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    snapshotForInterpolation();\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
 
 Two details do a lot of work here. The accumulator is **clamped at 0.25 s**, so a stall (a window drag, a breakpoint) can't make the game try to catch up on hundreds of ticks at once, the classic "spiral of death". And **hit-stop**, the brief freeze when a hit lands, is implemented by consuming ticks without simulating, so it's frame-rate independent for free.
 
-Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** the camera between the last two physics states using whatever fraction of a tick is left in the accumulator:
+Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** between the last two physics states using whatever fraction of a tick is left in the accumulator. The camera, every enemy, projectile and pickup, and the moving platforms all keep their previous position for this, so the game is smooth at 240 or 360 Hz too:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="2284-2288" code={"void render() override {\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/GameplayState.h" lines="2600-2606" code={"void render() override {\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
 
 ### Movement that rewards skill
 
 The obvious implementation, `velocity = direction * speed`, feels dead: no momentum, and nothing to master. OVERDRIVE uses Quake's acceleration model instead. It projects the current velocity onto the direction you're pressing and only adds speed up to a cap **along that direction**:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/Player.h" lines="241-259" code={"// WASD acceleration \u2014 suppressed while sliding so momentum carries.\nif (!sliding) {\n    glm::vec3 wishDir{0.f};\n    if (keys[SDL_SCANCODE_W]) wishDir += flatFwd;\n    if (keys[SDL_SCANCODE_S]) wishDir -= flatFwd;\n    if (keys[SDL_SCANCODE_D]) wishDir += flatRight;\n    if (keys[SDL_SCANCODE_A]) wishDir -= flatRight;\n\n    float accel = onGround ? acceleration : airAcceleration;\n\n    if (glm::length(wishDir) > 0.001f) {\n        wishDir = glm::normalize(wishDir);\n        glm::vec3 hVel{velocity.x, 0.f, velocity.z};\n        float currentSpeed = glm::dot(hVel, wishDir);\n        float addSpeed = glm::clamp(horizontalSpeed - currentSpeed, 0.f, accel * dt);\n        velocity.x += wishDir.x * addSpeed;\n        velocity.z += wishDir.z * addSpeed;\n    }\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/Player.h" lines="247-265" code={"// WASD acceleration \u2014 suppressed while sliding so momentum carries.\nif (!sliding) {\n    glm::vec3 wishDir{0.f};\n    if (keys[SDL_SCANCODE_W]) wishDir += flatFwd;\n    if (keys[SDL_SCANCODE_S]) wishDir -= flatFwd;\n    if (keys[SDL_SCANCODE_D]) wishDir += flatRight;\n    if (keys[SDL_SCANCODE_A]) wishDir -= flatRight;\n\n    float accel = onGround ? acceleration : airAcceleration;\n\n    if (glm::length(wishDir) > 0.001f) {\n        wishDir = glm::normalize(wishDir);\n        glm::vec3 hVel{velocity.x, 0.f, velocity.z};\n        float currentSpeed = glm::dot(hVel, wishDir);\n        float addSpeed = glm::clamp(horizontalSpeed - currentSpeed, 0.f, accel * dt);\n        velocity.x += wishDir.x * addSpeed;\n        velocity.z += wishDir.z * addSpeed;\n    }\n}"} />
 
 Because the cap is on the *projection*, turning the camera while strafing in the air keeps finding directions where `currentSpeed` is below the cap, so a skilled player can gain speed beyond the normal maximum. That's the same mechanic behind strafe-jumping in Quake and the movement feel of Titanfall and ULTRAKILL. Air acceleration is about half of ground acceleration (42 vs 80), friction drops to a quarter during a slide, and it's skipped entirely while grappling so the hook can build speed. Getting the grapple and dash to feel right took five separate commits of tuning and fixes.
 
@@ -87,7 +87,7 @@ That only works if the player can read it, so every enemy is a rig of boxes on j
 
 Waves are run by a small director that keeps 6 to 10 enemies on the field and trickles the rest in, away from the player:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/WaveDirector.h" lines="84-90" code={"} else if (!queue.empty() && aliveCount < current().maxAlive && spawnTimer <= 0.f) {\n    Queued q = queue.front();\n    queue.erase(queue.begin());\n    out.push_back({q.type, q.fixed ? q.pos : pickSpawn(q.type, playerPos)});\n    spawnTimer = SPAWN_GAP;\n    ++aliveCount;   // it's on the field now; don't call the wave clear this tick\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/WaveDirector.h" lines="105-111" code={"} else if (!queue.empty() && aliveCount < maxAlive() && spawnTimer <= 0.f) {\n    Queued q = queue.front();\n    queue.erase(queue.begin());\n    out.push_back({q.type, q.fixed ? q.pos : pickSpawn(q.type, playerPos)});\n    spawnTimer = SPAWN_GAP;\n    ++aliveCount;   // it's on the field now; don't call the wave clear this tick\n}"} />
 
 That last line is a bug fix. Without it, the wave-clear check right below compared against the alive count from *before* the spawn, so a wave whose last enemy spawned into an empty field ended instantly. The boss wave is a single enemy, so it always did. The director and the enemy AI have no OpenGL in them, which is what made this findable: a headless test drives the director through an entire simulated run, and a regression test now holds the boss wave open while the boss is alive.
 
@@ -97,23 +97,31 @@ The fourth arena, the Spire, is built around height: a 26 m tower with ledges, b
 
 Lifts, sweepers and orbiting platforms connect the tiers, and you can grapple any of them. They needed almost no new machinery: a moving platform is an ordinary wall flagged as dynamic. It moves every physics tick and records how far it went. It's kept out of the spatial grid and tested every tick instead. The player remembers which wall it is standing on, and riding a platform is just adding that platform's movement before the physics step. A test sweeps every platform through two full cycles and fails if any of them ever passes through a wall.
 
-Fast mode reuses the same wave director with a flag. Its first version was a straight run of sections, and it played like a hallway, so I rebuilt it around how shooters pace fights: a level is a long, wide channel that starts with a **breather** (health waiting, nothing shooting) and only starts its fight when you walk into a trigger. The six levels turn left and right, climb a set of terraces, cross a void, drop down a tower floor by floor and end with a climb to a beacon. Tests check that no enemy is placed in a breather, that every fight waits for its trigger, that the route really does change direction and height, and that every placed enemy appears exactly once, exactly where it was placed.
+Fast mode reuses the same wave director with a flag. Its first version was a straight run of sections, and it played like a hallway. The second made each section a long channel with a breather before the fight, which paced better but still read as one corridor. The current version, the Gauntlet, is built as **rooms joined by boost tubes**. A tube is the breather: health waiting, nothing shooting, and a ribbed tunnel that fires you along at 26 m/s. Doors split open as you sprint at them, lock behind you when a room's fight starts, and the exit unlocks when the room is clear. The seven rooms are a canal between raised walkways, five terraces climbing 20 m, islands and ferries over a void, a tower you fall through floor by floor, a pump room opening into a hall with galleries, and a courtyard with a lift shaft up to the beacon. Tests check that no enemy is placed in a tube, that every fight waits for its room, that the route really does change direction and height, and that every placed enemy appears exactly once, exactly where it was placed.
 
 ### An enemy worth parrying
 
 Parrying was in from the start, but nothing made it necessary. The Juggernaut is built around it: its armor halves bullet damage, its slow siege shells come back for 400 if you parry them, and punching its overhead smash in the last 0.4 s of the wind-up breaks it, leaving it staggered and taking double damage. The parry itself became a visible punch with a clank, a flash and a hit-stop, and its window now scales with the speed of the shot, so a sniper round is as fair to parry as a slow orb.
 
+### Headshots that match the model
+
+Shots that clearly hit an enemy in the head kept doing body damage, and the Juggernaut was the worst case. There were two causes. The Juggernaut had simply been left off the list of enemies with heads. And for everyone else, a headshot was decided by **where the bullet entered the enemy's body box**: above 80% of its height counted as the head. A body box is as wide as the shoulders, so when you aim up at a 3 m enemy, the ray enters the front face of the box well below the head it is about to hit. The reverse happened too: a Brute's shoulder pads sat inside its "head" band.
+
+Now each enemy has a real head hitbox, built from the same proportions as its model, so the head you see is the head you hit. The humanoids share a table of body measurements (leg length, torso height, head size) that both the rig and the hitbox read. The box follows the model's animation: walking bob, a broken Juggernaut slumping forward, a Ripper's crouch before its lunge, a Raptor pitching into a dive. Because the box is rotated with the enemy's facing, the code transforms its corners into world space and takes the axis-aligned box around them. It is slightly larger than the drawn head so a shot that grazes it still counts. A shot is a headshot when the ray passes through that box before any wall, even where the head pokes out above the body box. A headshot now also flashes the hitmarker gold, so you know it landed. Tests fire rays from eye height at every humanoid's head and chest and check which ones count.
+
 ### A renderer with no art assets
 
 There isn't a single image file in the repository. Floor grids, brick walls, metal ceilings and crates are generated at startup from value noise and uploaded as textures:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/TextureGen.h" lines="18-31" code={"inline float hash(float x, float y) {\n    float h = sinf(x * 12.9898f + y * 78.233f) * 43758.5453f;\n    return h - floorf(h);\n}\n\ninline float smoothNoise(float x, float y) {\n    float ix = floorf(x), iy = floorf(y);\n    float fx = x - ix, fy = y - iy;\n    fx = fx * fx * (3.f - 2.f * fx);\n    fy = fy * fy * (3.f - 2.f * fy);\n    float a = hash(ix, iy), b = hash(ix+1, iy);\n    float c = hash(ix, iy+1), d = hash(ix+1, iy+1);\n    return a + (b-a)*fx + (c-a)*fy + (a-b-c+d)*fx*fy;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/TextureGen.h" lines="22-35" code={"inline float hash(float x, float y) {\n    float h = sinf(x * 12.9898f + y * 78.233f) * 43758.5453f;\n    return h - floorf(h);\n}\n\ninline float smoothNoise(float x, float y) {\n    float ix = floorf(x), iy = floorf(y);\n    float fx = x - ix, fy = y - iy;\n    fx = fx * fx * (3.f - 2.f * fx);\n    fy = fy * fy * (3.f - 2.f * fy);\n    float a = hash(ix, iy), b = hash(ix+1, iy);\n    float c = hash(ix, iy+1), d = hash(ix+1, iy+1);\n    return a + (b-a)*fx + (c-a)*fy + (a-b-c+d)*fx*fy;\n}"} />
 
 The frame renders to an offscreen framebuffer, with all enemies in a single instanced draw call, then goes through bloom: a bright-pass extract followed by **ten** separable Gaussian blur passes that ping-pong between two framebuffers, alternating horizontal and vertical:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/PostProcess.h" lines="116-125" code={"bool horizontal = true;\nfor (int i=0;i<10;++i) {\n    glBindFramebuffer(GL_FRAMEBUFFER,bloomFBO[horizontal?1:0]);\n    blurShader.use();\n    blurShader.setInt(\"image\",0);\n    blurShader.setInt(\"horizontal\",horizontal?1:0);\n    glBindTexture(GL_TEXTURE_2D,bloomTex[horizontal?0:1]);\n    drawQuad();\n    horizontal = !horizontal;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/PostProcess.h" lines="135-144" code={"bool horizontal = true;\nfor (int i=0;i<10;++i) {\n    glBindFramebuffer(GL_FRAMEBUFFER,bloomFBO[horizontal?1:0]);\n    blurShader.use();\n    blurShader.setInt(\"image\",0);\n    blurShader.setInt(\"horizontal\",horizontal?1:0);\n    glBindTexture(GL_TEXTURE_2D,bloomTex[horizontal?0:1]);\n    drawQuad();\n    horizontal = !horizontal;\n}"} />
 
 The optional CRT pass adds barrel distortion, chromatic aberration and scanlines on top, before the HUD and the weapon view model are drawn.
+
+Everything renders into a 16:9 canvas at a fixed resolution and is then scaled into the window, letterboxed if needed, while the HUD lays itself out in a virtual 1280×720. That makes resolution a single number, and the **graphics quality** setting picks it: 720p, 1080p, 1440p or 4K. Rendering above the screen's own resolution is supersampling, which smooths edges. Above the lowest setting the world textures also get anisotropic filtering, so floors stay sharp where they stretch into the distance. On an M2 MacBook a frame takes about 1.7 ms at 720p, 3.8 ms at 1440p and 6 ms at 4K.
 
 ### Porting it to the browser
 
@@ -124,6 +132,7 @@ The same C++ runs above as WebAssembly, drawing through WebGL2. Most of the port
 - **Escape belongs to the browser.** Pressing Esc releases pointer lock before the game ever sees the key, so losing the lock mid-run now pauses the game. `P` pauses too.
 - **The mouse can lie.** Under pointer lock, Chrome occasionally reports one enormous mouse delta, which snapped the view round 180°. The page now asks for raw input (`unadjustedMovement`) where the browser supports it, and the game drops a single delta that is many times larger than the ones around it. Two large deltas in a row are a real flick and still go through.
 - **Saving.** Emscripten's filesystem lives in memory and is forgotten on reload, so settings and best times go to `localStorage` instead.
+- **Real pixels.** The web build first rendered into a fixed 1280×720 canvas that the browser stretched to fit, so it always looked soft. The canvas now gets the screen pixels it actually covers (CSS size × `devicePixelRatio`), capped at the graphics quality's resolution. One catch: SDL's web port reports its window size, not the canvas's, as the drawable size, so the frame filled only the corner of a larger canvas until the final blit read the canvas size directly. The page starts on 1080p, which is gentle on laptops in a browser.
 
 On an M2 MacBook it holds 60 fps in Chrome, the same as the native build at that refresh rate.
 
@@ -142,7 +151,8 @@ Before putting the game in front of people I read it end to end, and wrote a sma
 
 ## Results
 
-- A complete game loop: a menu with two modes, settings that persist between launches (FOV, sensitivity, zoom sensitivity, volume, FPS cap, screen shake and more), four arenas with their own lighting, fog and procedural sky, a boss fight, a time trial with splits and saved best times, XP and weapon upgrades, checkpoint retries, style scoring, a pause menu, and victory/death screens.
+- A complete game loop: a menu with two modes, four difficulties, settings that persist between launches (FOV, sensitivity, zoom sensitivity, volume, frame rate up to 360 Hz, graphics quality, screen shake and more), four arenas with their own lighting, fog and procedural sky, a boss fight, a time trial with splits and saved best times, XP and weapon upgrades, checkpoint retries, style scoring, a pause menu, and victory/death screens.
+- A soundtrack synthesized live in the audio callback, with a track per area and layers that build from the tubes into each fight. Weapons have full reload animations (the revolver's cylinder swings out, the shotgun loads shell by shell) timed to their sounds, and an inspect animation.
 - Procedurally synthesized sound effects for most of the game, plus gunshots, footsteps, whooshes and the parry clank cut from public-domain (CC0) recordings by a script, each trimmed to start within a few milliseconds of the trigger.
 - Consistent movement across refresh rates, thanks to the fixed step and interpolation.
 - Builds and runs on macOS, Windows and in the browser. It also compiles and passes its physics tests on Linux (Ubuntu 24.04), but I haven't played it on a Linux desktop, so I don't claim Linux support yet.
