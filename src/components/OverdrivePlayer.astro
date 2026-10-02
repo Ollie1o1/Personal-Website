@@ -1,6 +1,6 @@
 ---
 // OVERDRIVE compiled to WebAssembly + WebGL2 with Emscripten (public/overdrive/,
-// synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). The ~3.2 MB game
+// synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). The ~1.7 MB game
 // only loads when asked for, inside an iframe so its keyboard and pointer-lock
 // handling stay isolated from the page.
 ---
@@ -10,7 +10,7 @@
     <span class="lamp" aria-hidden="true"></span>
     <span data-od-state>OVERDRIVE · not loaded</span>
     <span class="spacer"></span>
-    <span class="dim">C++ → WebAssembly + WebGL2 · 3.2 MB</span>
+    <span class="dim">C++ → WebAssembly + WebGL2 · 1.7 MB</span>
   </header>
 
   <div class="stage" data-od-stage>
@@ -18,7 +18,7 @@
     <button type="button" class="launch mono" data-od-launch>
       <span class="tri" aria-hidden="true">▶</span>
       <span>Load and play in the browser</span>
-      <span class="size">3.2 MB · keyboard and mouse</span>
+      <span class="size">1.7 MB · keyboard and mouse</span>
     </button>
     <p class="touch-note mono">OVERDRIVE needs a keyboard and mouse. Open this page on a computer to play.</p>
   </div>
@@ -27,7 +27,7 @@
     <p class="keys">
       <kbd>WASD</kbd> move <kbd>Mouse</kbd> look <kbd>LMB</kbd> fire <kbd>RMB</kbd> aim (rifles)
       <kbd>Q</kbd> grapple <kbd>Space</kbd> jump <kbd>Shift</kbd> dash <kbd>1</kbd>–<kbd>4</kbd> weapons
-      <kbd>Tab</kbd> armory <kbd>G</kbd> grenade <kbd>F</kbd> punch / parry <kbd>Esc</kbd> pause
+      <kbd>Tab</kbd> armory <kbd>G</kbd> grenade <kbd>F</kbd> punch / parry <kbd>Esc</kbd> pause (leave fullscreen from the pause menu, or hold <kbd>Esc</kbd>)
     </p>
     <button type="button" class="fs" data-od-fullscreen hidden>Fullscreen</button>
   </div>
@@ -52,12 +52,30 @@
     frame.addEventListener('load', () => frame.focus());
   });
 
-  // The game shell posts a message once the player has clicked in
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else stage.querySelector('iframe')?.requestFullscreen?.().catch(() => {});
+  };
+
+  // The game shell posts a message once the player has clicked in, and asks
+  // for fullscreen from its pause menu
   window.addEventListener('message', (e) => {
-    if (e.origin === location.origin && e.data?.overdrive === 'running') state.textContent = 'OVERDRIVE · running';
+    if (e.origin !== location.origin) return;
+    if (e.data?.overdrive === 'running') state.textContent = 'OVERDRIVE · running';
+    if (e.data?.overdrive === 'fullscreen') toggleFullscreen();
   });
 
-  fsBtn.addEventListener('click', () => stage.querySelector('iframe')?.requestFullscreen?.());
+  // In fullscreen the game uses Escape (pause, close the armory). Browsers
+  // that allow it (Chrome, Edge) hand Escape to the page while fullscreen;
+  // holding it, or EXIT FULLSCREEN in the pause menu, still gets you out.
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) navigator.keyboard?.lock?.(['Escape'])?.catch?.(() => {});
+    else navigator.keyboard?.unlock?.();
+    fsBtn.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+    stage.querySelector('iframe')?.focus();
+  });
+
+  fsBtn.addEventListener('click', toggleFullscreen);
 </script>
 
 <style>
