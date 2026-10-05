@@ -1,6 +1,6 @@
 ---
 // OVERDRIVE compiled to WebAssembly + WebGL2 with Emscripten (public/overdrive/,
-// synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). The ~1.7 MB game
+// synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). The ~1.8 MB game
 // only loads when asked for, inside an iframe so its keyboard and pointer-lock
 // handling stay isolated from the page.
 ---
@@ -10,7 +10,7 @@
     <span class="lamp" aria-hidden="true"></span>
     <span data-od-state>OVERDRIVE · not loaded</span>
     <span class="spacer"></span>
-    <span class="dim">C++ → WebAssembly + WebGL2 · 1.7 MB</span>
+    <span class="dim">C++ → WebAssembly + WebGL2 · 1.8 MB</span>
   </header>
 
   <div class="stage" data-od-stage>
@@ -18,7 +18,7 @@
     <button type="button" class="launch mono" data-od-launch>
       <span class="tri" aria-hidden="true">▶</span>
       <span>Load and play in the browser</span>
-      <span class="size">1.7 MB · keyboard and mouse</span>
+      <span class="size">1.8 MB · keyboard and mouse</span>
     </button>
     <p class="touch-note mono">OVERDRIVE needs a keyboard and mouse. Open this page on a computer to play.</p>
   </div>
@@ -41,7 +41,7 @@
 
   root.querySelector('[data-od-launch]').addEventListener('click', () => {
     const frame = document.createElement('iframe');
-    frame.src = '/overdrive/index.html'; // opens on the menu: choose ARENA or FAST
+    frame.src = '/overdrive/index.html'; // opens on the menu: ARENA, FAST, ENDLESS or DAILY
     frame.title = 'OVERDRIVE (playable)';
     frame.allow = 'fullscreen; autoplay; pointer-lock';
     frame.allowFullscreen = true;

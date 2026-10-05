@@ -1,8 +1,9 @@
 #!/bin/sh
 # Copy OVERDRIVE's WebAssembly build into public/overdrive/.
-# Build it first:  cd ../../Desktop/3d_shooter && source ~/emsdk/emsdk_env.sh && make web
+# Build it first:  cd ../3d_shooter && source ~/emsdk/emsdk_env.sh && make web
+# (the game sits beside this repo, in ~/Projects/overdrive)
 set -e
-SRC="${1:-$HOME/Desktop/3d_shooter/web/dist}"
+SRC="${1:-$(dirname "$0")/../../3d_shooter/web/dist}"
 DEST="$(dirname "$0")/../public/overdrive"
 [ -f "$SRC/overdrive.wasm" ] || { echo "no build at $SRC — run 'make web' in 3d_shooter"; exit 1; }
 rm -rf "$DEST" && mkdir -p "$DEST"
