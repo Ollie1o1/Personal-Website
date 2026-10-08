@@ -87,7 +87,7 @@ That only works if the player can read it, so every enemy is a rig of boxes on j
 
 Waves are run by a small director that keeps 6 to 10 enemies on the field and trickles the rest in, away from the player:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/WaveDirector.h" lines="167-174" code={"} else if (!queue.empty() && spawnTimer <= 0.f &&\n           (aliveCount + 1 + (int)queue.front().escort.size() <= maxAlive() || aliveCount == 0)) {\n    Queued q = queue.front();\n    queue.erase(queue.begin());\n    aliveCount += emitSquad(q, playerPos, out);   // on the field now; don't call the wave clear this tick\n    spawnTimer = SPAWN_GAP;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/WaveDirector.h" lines="168-174" code={"} else if (!queue.empty() && spawnTimer <= 0.f &&\n           (aliveCount + 1 + (int)queue.front().escort.size() <= maxAlive() || aliveCount == 0)) {\n    Queued q = queue.front();\n    queue.erase(queue.begin());\n    aliveCount += emitSquad(q, playerPos, out);   // on the field now; don't call the wave clear this tick\n    spawnTimer = SPAWN_GAP;\n}"} />
 
 Counting the squad as alive the moment it spawns is a bug fix. Without it, the wave-clear check right below compared against the alive count from *before* the spawn, so a wave whose last enemy spawned into an empty field ended instantly. The boss wave is a single enemy, so it always did. The director and the enemy AI have no OpenGL in them, which is what made this findable: a headless test drives the director through an entire simulated run, and a regression test now holds the boss wave open while the boss is alive.
 
