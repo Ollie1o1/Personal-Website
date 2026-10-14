@@ -10,15 +10,15 @@ stack: ['Python', 'NumPy', 'Pandas', 'SciPy', 'SQLite', 'Streamlit', 'FastAPI']
 repo: 'https://github.com/Ollie1o1/options'
 stats:
   - { k: 'Tests', v: '6,000+' }
-  - { k: 'Commits', v: '1,338' }
+  - { k: 'Commits', v: '1,386' }
   - { k: 'Scoring factors', v: '27' }
   - { k: 'Realized', v: '+$9.2k', accent: true, note: 'discretionary trades I picked from its ranked signals, not autonomous trading' }
-asOf: '2026-09-29'
+asOf: '2026-10-14'
 ---
 
 ## Overview
 
-I started this in November 2025 as a script that ranked option contracts for a single ticker. It is now 180k lines of Python across 30 subpackages: live and archived chains from several providers, Black-Scholes pricing and Greeks, an SVI volatility smile, a 27-factor scorer whose weights shift with the VIX regime, portfolio and earnings gates, a paper-trading ledger, and four front ends (CLI, Streamlit dashboard, FastAPI service, Discord/Telegram bots) on one shared core.
+I started this in November 2025 as a script that ranked option contracts for a single ticker. It is now 184k lines of Python across 30 subpackages: live and archived chains from several providers, Black-Scholes pricing and Greeks, an SVI volatility smile, a 27-factor scorer whose weights shift with the VIX regime, portfolio and earnings gates, a paper-trading ledger, and four front ends (CLI, Streamlit dashboard, FastAPI service, Discord/Telegram bots) on one shared core.
 
 The part I'm proudest of isn't any of that. It's that **the system is built to tell me when it's wrong**. Every number a decision depends on is labelled as either *verifiable* (prices, IV, Greeks), *calibrated* (checked out of sample), or *experimental*, and a model that fails its own reliability test is refused at both the write side and the read side, so it can never reach a screen.
 

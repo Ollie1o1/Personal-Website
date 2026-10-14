@@ -1,8 +1,8 @@
 # oliver-raczka.vercel.app
 
-Personal site and portfolio of Oliver Raczka: three in-depth case studies (Options Screener, NES Emulator, OVERDRIVE), experience, and a downloadable resume.
+Personal site and portfolio of Oliver Raczka: three in-depth case studies (Options Screener, OVERDRIVE, NES Emulator), both games playable in the browser,, experience, and a downloadable resume.
 
-Static [Astro 7](https://astro.build) site. Hand-written CSS on design tokens, about 3 KB of vanilla TypeScript, no UI framework. Lighthouse (mobile): 99–100 on every category.
+Static [Astro 7](https://astro.build) site, plus one serverless function (`api/overdrive-board.js`, OVERDRIVE's shared leaderboard). Hand-written CSS on design tokens, about 3 KB of vanilla TypeScript, no UI framework. Lighthouse (mobile): 99–100 on every category.
 
 ## Commands
 
@@ -55,9 +55,13 @@ Anything you can't back up from the repo or its history goes in an MDX comment a
 
 ## Deploying
 
+The repo is connected to Vercel: every push to `main` deploys to production, and other branches get preview deployments. Run `npm run verify` before pushing.
+
+**Refresh the playable builds.** Build each game's web target first, then:
+
 ```bash
-npx vercel          # preview deployment
-npx vercel --prod   # production
+scripts/sync-overdrive.sh                                   # ../3d_shooter/web/dist → public/overdrive/
+scripts/sync-nes.sh ~/Projects/better_emulator/web/dist     # → public/nes/
 ```
 
 If the production URL differs from `https://oliver-raczka.vercel.app`, update it in `src/site.config.ts`, `astro.config.mjs` and `public/robots.txt`.
