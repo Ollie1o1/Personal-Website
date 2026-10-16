@@ -69,7 +69,7 @@ Movement in a game like this is tuned by feel: jump height, dash distance, how m
 
 Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** between the last two physics states using whatever fraction of a tick is left in the accumulator. The camera, every enemy, projectile and pickup, and the moving platforms all keep their previous position for this, so the game is smooth at 240 or 360 Hz too:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/Gameplay_Render.h" lines="443-449" code={"inline void GameplayState::render() {\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/Gameplay_Render.h" lines="445-451" code={"inline void GameplayState::render() {\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
 
 ### Movement that rewards skill
 
