@@ -10,15 +10,15 @@ stack: ['Python', 'NumPy', 'Pandas', 'SciPy', 'SQLite', 'Streamlit', 'FastAPI']
 repo: 'https://github.com/Ollie1o1/options'
 stats:
   - { k: 'Tests', v: '6,000+' }
-  - { k: 'Commits', v: '1,386' }
+  - { k: 'Commits', v: '1,418' }
   - { k: 'Scoring factors', v: '27' }
   - { k: 'Realized', v: '+$9.2k', accent: true, note: 'discretionary trades I picked from its ranked signals, not autonomous trading' }
-asOf: '2026-10-14'
+asOf: '2026-10-16'
 ---
 
 ## Overview
 
-I started this in November 2025 as a script that ranked option contracts for a single ticker. It is now 184k lines of Python across 30 subpackages: live and archived chains from several providers, Black-Scholes pricing and Greeks, an SVI volatility smile, a 27-factor scorer whose weights shift with the VIX regime, portfolio and earnings gates, a paper-trading ledger, and four front ends (CLI, Streamlit dashboard, FastAPI service, Discord/Telegram bots) on one shared core.
+I started this in November 2025 as a script that ranked option contracts for a single ticker. It is now 185k lines of Python across 34 subpackages: live and archived chains from several providers, Black-Scholes pricing and Greeks, an SVI volatility smile, a 27-factor scorer whose weights shift with the VIX regime, portfolio and earnings gates, a paper-trading ledger, and four front ends (CLI, Streamlit dashboard, FastAPI service, Discord/Telegram bots) on one shared core.
 
 The part I'm proudest of isn't any of that. It's that **the system is built to tell me when it's wrong**. Every number a decision depends on is labelled as either *verifiable* (prices, IV, Greeks), *calibrated* (checked out of sample), or *experimental*, and a model that fails its own reliability test is refused at both the write side and the read side, so it can never reach a screen.
 
@@ -100,6 +100,8 @@ These are the project's own verdicts from its evidence snapshot (2026-08-24), me
 | Does anything predict expected profit per contract? | **No.** Both candidate models were refused by the guard and are not displayed. |
 | Does expected value order the board? | **Unknown until 2026-11-19**, by design. |
 
+The bull put result didn't survive a harder question. A structure that sells puts earns money in a rising market just by being long it, so in October I pre-registered a test of whether the bull put book beats simply holding its own delta, and replayed the live rule on fourteen years of real SPY option quotes (optionsDX, 2010–2023, 927 trades). It earned **2.10% of capital at risk per trade less than its own delta**, CI [−2.72%, −1.59%], entirely below zero: costly beta, not an edge. The paper book points the same way (−4.02% per trade against its delta, CI [−9.61%, +1.64%]). The project's written decision rule now vetoes that rule for real money, and the screener stopped paper-logging bull puts the same day.
+
 Separately, and outside the tool, I've traded its signals with my own money: **+$9.2k realized** from discretionary trades I picked from its ranked output. The tool does not trade on its own, and I don't present that figure as evidence the model has an edge. The table above is that evidence, and it says the edge is narrow.
 
 ## What I'd do next
@@ -107,3 +109,4 @@ Separately, and outside the tool, I've traded its signals with my own money: **+
 - **Read out the pre-registration** on 2026-11-19 and act on the result, including if it says EV doesn't order the board.
 - **Fix the within-strategy inversions.** Inside bear calls and short puts the calibrated ordering still points the wrong way on about 50 trades a side. That's reported today, not gated on, because choosing what to display from the same data that measured it would fit the display to noise.
 - **Replace model-priced backtest premiums** with the real bid/ask history the daily chain archive has been compounding since June.
+- **Find a rule that beats its own delta, or stop looking.** The decision rule's only path to real money is a new rule, pre-registered, that clears its delta on the fourteen-year index replay and then on its own forward paper record, followed by a pilot capped at $1,500 of risk. The replay already says where to start: at mid-price fills the premium turns positive (+0.31%), so the cost of crossing the spread twice is the deficit to fix first.
