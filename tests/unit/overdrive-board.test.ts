@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import handler, { cleanName, validate, parseTop, maxScore, dailyDateOk, boardKey } from '../../api/overdrive-board.js';
+import handler, { cleanName, validate, parseTop, maxScore, boardKey } from '../../api/overdrive-board.js';
 
 function mockRes() {
   const res: any = { headers: {} as Record<string, string>, statusCode: 0, body: undefined };
@@ -33,18 +33,11 @@ describe('OVERDRIVE leaderboard API', () => {
     expect(validate({ mode: 'fast', name: 'A', time: 600, difficulty: 9 }).error).toBe('difficulty');
   });
 
-  it('takes a daily run only for today, give or take a day', () => {
-    const now = new Date(Date.UTC(2026, 9, 5, 12));
-    expect(dailyDateOk('20261005', now)).toBe(true);
-    expect(dailyDateOk('20261004', now)).toBe(true);
-    expect(dailyDateOk('20261006', now)).toBe(true);
-    expect(dailyDateOk('20261001', now)).toBe(false);
-    expect(dailyDateOk('nope', now)).toBe(false);
-    const run = { mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6, date: '20261005' };
-    expect(validate(run, now).date).toBe('20261005');
-    expect(validate({ ...run, date: '20250101' }, now).error).toBe('date');
-    expect(boardKey('daily', '20261005')).toBe('od:board2:daily:20261005');
+  it('keeps one board per mode, and the old daily mode is gone', () => {
     expect(boardKey('fast')).toBe('od:board:fast');
+    expect(boardKey('arena')).toBe('od:board2:arena');
+    expect(boardKey('endless')).toBe('od:board2:endless');
+    expect(validate({ mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6 }).error).toBe('mode');
   });
 
   it('reads Redis WITHSCORES replies', () => {
@@ -78,7 +71,7 @@ describe('OVERDRIVE leaderboard API', () => {
     expect(JSON.stringify(calls)).toContain('ZADD');
   });
 
-  it("ranks score boards highest first and keeps a day's board for a few days", async () => {
+  it('ranks score boards highest first', async () => {
     vi.stubEnv('KV_REST_API_URL', 'https://redis.example'); vi.stubEnv('KV_REST_API_TOKEN', 't');
     const calls: string[][][] = [];
     vi.stubGlobal('fetch', vi.fn(async (_url: string, init: { body: string }) => {
@@ -89,16 +82,14 @@ describe('OVERDRIVE leaderboard API', () => {
         : c[0] === 'ZRANGE' ? { result: [JSON.stringify({ n: 'OLLIE', d: 1, t: 300, w: 6 }), '5000'] } : { result: 1 });
       return { ok: true, json: async () => result };
     }));
-    const now = new Date();
-    const date = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, '0')}${String(now.getUTCDate()).padStart(2, '0')}`;
     const res = mockRes();
-    await handler({ method: 'POST', body: { mode: 'daily', name: 'ollie', time: 300, difficulty: 1, score: 5000, wave: 6, date },
+    await handler({ method: 'POST', body: { mode: 'endless', name: 'ollie', time: 300, difficulty: 1, score: 5000, wave: 6 },
                     headers: { 'x-forwarded-for': '5.6.7.8' } }, res);
     expect(res.statusCode).toBe(200);
     expect(res.body.entries[0]).toEqual({ name: 'OLLIE', score: 5000, time: 300, difficulty: 1, wave: 6 });
     const flat = calls.flat();
-    expect(flat.find((c) => c[0] === 'ZADD')?.[1]).toBe(`od:board2:daily:${date}`);
+    expect(flat.find((c) => c[0] === 'ZADD')?.[1]).toBe('od:board2:endless');
     expect(flat.find((c) => c[0] === 'ZRANGE')).toContain('REV');
-    expect(flat.find((c) => c[0] === 'EXPIRE' && String(c[1]).startsWith('od:board2'))).toBeTruthy();
+    expect(flat.find((c) => c[0] === 'EXPIRE' && String(c[1]).startsWith('od:board2'))).toBeFalsy();   // boards are kept
   });
 });
