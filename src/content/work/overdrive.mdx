@@ -69,7 +69,7 @@ Movement in a game like this is tuned by feel: jump height, dash distance, how m
 
 Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** between the last two physics states using whatever fraction of a tick is left in the accumulator. The camera, every enemy, projectile and pickup, and the moving platforms all keep their previous position for this, so the game is smooth at 240 or 360 Hz too:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Render.h" lines="445-452" code={"inline void GameplayState::render() {\n    frametimer::Lap ftLap;\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Render.h" lines="447-454" code={"inline void GameplayState::render() {\n    frametimer::Lap ftLap;\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
 
 ### Movement that rewards skill
 
@@ -139,11 +139,11 @@ There isn't a single image file in the repository. Floor grids, brick walls, met
 
 The frame renders to an offscreen framebuffer, with all enemies in a single instanced draw call, then goes through bloom: a bright-pass extract followed by **ten** separable Gaussian blur passes that ping-pong between two framebuffers, alternating horizontal and vertical:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/render/PostProcess.h" lines="144-153" code={"bool horizontal = true;\nfor (int i=0;i<10;++i) {\n    glBindFramebuffer(GL_FRAMEBUFFER,bloomFBO[horizontal?1:0]);\n    blurShader.use();\n    blurShader.setInt(\"image\",0);\n    blurShader.setInt(\"horizontal\",horizontal?1:0);\n    glBindTexture(GL_TEXTURE_2D,bloomTex[horizontal?0:1]);\n    drawQuad();\n    horizontal = !horizontal;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/render/PostProcess.h" lines="203-212" code={"bool horizontal = true;\nfor (int i=0;i<10;++i) {\n    glBindFramebuffer(GL_FRAMEBUFFER,bloomFBO[horizontal?1:0]);\n    blurShader.use();\n    blurShader.setInt(\"image\",0);\n    blurShader.setInt(\"horizontal\",horizontal?1:0);\n    glBindTexture(GL_TEXTURE_2D,bloomTex[horizontal?0:1]);\n    drawQuad();\n    horizontal = !horizontal;\n}"} />
 
 The optional CRT pass adds barrel distortion, chromatic aberration and scanlines on top, before the HUD and the weapon view model are drawn.
 
-Everything renders into a 16:9 canvas at a fixed resolution and is then scaled into the window, letterboxed if needed, while the HUD lays itself out in a virtual 1280×720. That makes resolution a single number, and the **graphics quality** setting picks it: 720p, 1080p, 1440p or 4K. Rendering above the screen's own resolution is supersampling, which smooths edges. Above the lowest setting the world textures also get anisotropic filtering, so floors stay sharp where they stretch into the distance. On an M2 MacBook a frame takes about 1.7 ms at 720p, 3.8 ms at 1440p and 6 ms at 4K.
+Everything renders into a 16:9 canvas at a fixed resolution and is then scaled into the window, letterboxed if needed, while the HUD lays itself out in a virtual 1280×720. That makes resolution a single number, and the **graphics quality** setting picks it: 720p, 1080p, 1440p or 4K. Rendering above the screen's own resolution is supersampling, which smooths edges. On top of that, **anti-aliasing** (4x MSAA by default) draws the scene with four samples a pixel and averages them before bloom, which keeps the thin neon lines on the floors whole in the distance instead of breaking into dashes. The scene is stored in a packed 32-bit float format (R11G11B10F) rather than 64-bit RGBA16F, which halved what 4x MSAA cost. Above the lowest setting the world textures also get anisotropic filtering, so floors stay sharp where they stretch into the distance. On an M2 MacBook Air a frame takes about 2.0 ms at 720p, 3.5 ms at 1440p and 6.2 ms at 4K with anti-aliasing off; 4x adds about 0.2, 1.3 and 3 ms.
 
 ### Sound from somewhere
 
