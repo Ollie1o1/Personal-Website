@@ -375,11 +375,13 @@ A scan treats every spot you could stand on in every arena and corridor as reach
 
 ## Tools
 
-### Guns made in Blender
+### Guns and enemies made in Blender
 
 Each gun's shape, and the sword's, is a glTF file of boxes on named joints (the revolver's crane and cylinder, the shotgun's pump, the rifles' bolts) that the code moves and lights every frame. The ammo cells, muzzle flash and reload props stay in code because they depend on the moment.
 
 Before the hand-written recipes were deleted, a test proved the files drew the same guns **box for box across 1,169 states each**. A viewer (`./shooter --viewer`) reloads a gun the moment it's saved, and a Blender add-on with a live link can send edits straight from Blender. The shotgun's vented heat shield and the redesigned sword were both built that way.
+
+The enemies are next. The Husk, the first enemy you meet, is now a file too: its six joints (hips, torso, head, shoulders) sit where the code turns them, so the walk, the aim and the wind-up animations work unchanged. Moving it into a file was proven box for box against the old code rig, then it was rebuilt in Blender from 16 boxes to 88: rust plate over a dark frame, hot eyes behind a visor, a chest core and a reactor pack that flare as it winds up, and an orb cannon whose coils heat as the shot builds. Tests hold every box of its head inside its head hitbox, so the head you see is still the head you hit.
 
 ### Balance on sliders
 
