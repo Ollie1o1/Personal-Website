@@ -191,7 +191,17 @@ const repoPath = d.repo.replace('https://github.com/', '');
     border-radius: var(--radius);
   }
   .prose :global(blockquote) { margin: 20px 0; padding-left: 16px; border-left: 2px solid var(--amber); }
-  .prose :global(table) { margin: 18px 0; font-size: 14px; }
+  .prose :global(hr) {
+    margin: 64px 0 0;
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--amber) 0 40px, var(--line) 40px);
+  }
+  .prose :global(hr + h2) { margin-top: 40px; }
+  .prose :global(h2 + h3) { margin-top: 20px; }
+  .prose :global(h3) { scroll-margin-top: 84px; }
+  .prose :global(table) { display: block; max-width: 100%; overflow-x: auto; margin: 22px 0 26px; font-size: 14px; border-collapse: collapse; }
+  .prose :global(td:first-child) { color: var(--fg); min-width: 6.5em; }
   .prose :global(th), .prose :global(td) { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; color: var(--body); }
   .prose :global(th) { font: 400 10px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); }
 </style>
