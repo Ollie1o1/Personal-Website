@@ -3,7 +3,7 @@ order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
 summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine. Two acts and an encore, eighteen enemy types including five bosses, four guns and a sword, a time trial, endless and boss modes, shared leaderboards and a soundtrack synthesized live. It also compiles to WebAssembly, so you can play it on this page.'
-description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts and an encore, thirteen enemy types and five bosses built as animated box rigs, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
+description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts and an encore, thirteen enemy types and five bosses built as animated rigs made in Blender, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Oct 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -139,7 +139,7 @@ Two details do a lot of work here:
 
 Running physics at 60 Hz on a 144 Hz screen would look like judder, so rendering **interpolates** between the last two physics states using whatever fraction of a tick is left in the accumulator. The camera, every enemy, projectile and pickup, and the moving platforms all keep their previous position for this, so the game is smooth at 240 or 360 Hz too:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Render.h" lines="505-512" code={"inline void GameplayState::render() {\n    frametimer::Lap ftLap;\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Render.h" lines="528-535" code={"inline void GameplayState::render() {\n    frametimer::Lap ftLap;\n    applyTextureQuality();\n    float alpha = (float)(accumulator / PHYSICS_DT);\n    renderAlpha = glm::clamp(alpha, 0.f, 1.f);\n    glm::vec3 renderCamPos = glm::mix(prevCamPos, player.camera.position, alpha);\n    Camera renderCam = player.camera;\n    renderCam.position = renderCamPos;"} />
 
 ### Movement that rewards skill
 
@@ -389,6 +389,12 @@ The five enemies you meet most after the Husk followed: the Sentinel (a lanky sn
 
 The Juggernaut and the Shieldbearer came next. The Juggernaut is a steel-and-gold siege mech whose furnace core throbs, whose cannon arm heats as it charges a shell and whose gold hammer fist lights only while it winds up a smash; parried, it slumps forward with its core strobing. The Shieldbearer's tower shield got a joint of its own, so the file's shield is braced in front, drawn back for a bash and knocked aside when it's parried, exactly as the code rig moved it. What the shield blocks is decided by angle, not by its shape, so the new model couldn't change the fight. The exporter needed one more trick for them: the rings on the Juggernaut's cannon are set at an angle on its arm, so it now finds the joint a part keeps a fixed offset from across every state, rather than only the frame it was drawn from.
 
+Then the rest, bosses included: every one of the game's twenty enemy models is a file now, from the Mite's 24 parts to the Absolute's 409. The Warden's heart is a reactor behind an iris of six plates that draw back when it vents, the shot that matters; the Leviathan's file holds its skull and jaw plus one plated body segment that the game lays along each stretch of its curving body, scaled to fit. Building them turned up three old rig bugs the new models would have shown off: the Penitent's right arm hung inside its robe, the Weaver's legs bent down through the floor, and the Anchor's hunch tipped its toes under it. Your own arms on the sword and the parrying gauntlet are a file too.
+
+Two things followed from real models. Deaths now break a body at its joints: every part on one joint (an arm, a leg, the head) flies off as a single piece holding its shape, the way the killing blow went, instead of a 300-part boss bursting into 300 fragments. And the arenas are dressed with props made the same way (market stalls, crates, broken columns, girder and carved pillars, a town on the Sunset Yard's skyline): a box keeps its collision and the prop is drawn in its place, stretched to fit it exactly, baked into the static level mesh. A test holds every prop inside the box it dresses, so what you see is what you collide with. Pickups, enemy shots and the grapple's claw are files as well.
+
+All that geometry swelled the model files to 8.3 MB, mostly with copies: Blender writes a rivet once per rivet. A small lossless pass shares identical data and took them down to 3.8 MB, checked part for part and vertex for vertex against the originals. Served compressed, the download barely changed, because the compression was already finding those repeats; what it saves is memory in the browser and load time.
+
 ### Balance on sliders
 
 Every gun's stats, every enemy's and boss's health, speed and timing, OVERDRIVE and the four difficulties (**170 numbers**) are named in one table that points straight at the values the game reads. A panel on F1 (Dear ImGui, desktop builds only) freezes the game to change them live, and saves what changed to a text file that the game and the tests both load at startup, so the tests check the numbers that ship.
@@ -418,11 +424,11 @@ Before putting the game in front of people I read it end to end and wrote the fi
 - **Gamepad support**, in the browser too.
 - **A soundtrack synthesized live** in the audio callback, with a track per area that builds from the tubes into each fight, plus gunshots built from CC0 recordings with a synthesized thump and ring under each, held to their recordings' body and brightness by a test.
 - **Consistent movement across refresh rates**, from 60 Hz to unlimited.
-- **Zero image files.** Textures are generated at load; guns and the sword are box files built in Blender.
+- **Zero image files.** Textures are generated at load; the guns, the sword, every enemy and boss, and the arena props are models built in Blender.
 - **Builds and runs** on macOS, Windows and in the browser. It also compiles and passes its tests on Linux (Ubuntu 24.04, in CI), but I haven't played it on a Linux desktop, so I don't claim Linux support yet.
 
 ## What I'd do next
 
 - **Touch controls for the web build.** Phones can run it but have no way to aim; twin virtual sticks would open it up to anyone visiting on mobile.
-- **Levels from files.** The guns already come from Blender; arenas built in a level editor (TrenchBroom) and enemies from files would let the content grow without touching C++.
+- **Levels from files.** The guns, enemies and props already come from Blender; arenas laid out in a level editor (TrenchBroom) would let the content grow without touching C++.
 - **A practice range** for learning the parry, the finisher and each boss's tells outside a fight.
