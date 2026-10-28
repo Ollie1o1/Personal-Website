@@ -1,9 +1,10 @@
 // OVERDRIVE's shared leaderboards: every visitor's finished runs.
 //
-//   GET  /api/overdrive-board?mode=arena|fast|endless   → { entries }  (top 10)
+//   GET  /api/overdrive-board?mode=arena|fast|endless|boss0..boss5   → { entries }  (top 10)
 //   POST /api/overdrive-board  { mode, name, time, difficulty, score, wave }  → { ok, entries }
 //
 // FAST is a time trial, ranked fastest first; entries are { name, time, difficulty }.
+// So is each boss (BOSS mode, boss0 THE WARDEN .. boss5 MORNINGSTAR): its fastest kills.
 // ARENA and ENDLESS rank by the game's combined score (style earned, a time
 // bonus or waves cleared, damage taken, x difficulty), highest first;
 // entries are { name, score, time, difficulty, wave }.
@@ -14,11 +15,13 @@
 // without them it answers 503 and the game keeps its per-browser boards.
 // Submissions are sanity-checked and each IP may post 10 an hour.
 
-export const MODES = ['arena', 'fast', 'endless'];
+export const BOSSES = ['boss0', 'boss1', 'boss2', 'boss3', 'boss4', 'boss5'];
+export const MODES = ['arena', 'fast', 'endless', ...BOSSES];
 export const SCORED = ['arena', 'endless'];   // ranked by score, highest first
 export const KEEP = 100;           // stored per board; GET returns the top TOP
 export const TOP = 10;
-export const MIN_TIME = { arena: 180, fast: 60, endless: 10 };   // faster than this isn't a real run
+export const MIN_TIME = { arena: 180, fast: 60, endless: 10,   // faster than this isn't a real run
+  ...Object.fromEntries(BOSSES.map((b) => [b, 15])) };
 export const MAX_TIME = 4 * 3600;
 export const MAX_WAVE = 500;
 export const POSTS_PER_HOUR = 10;
@@ -61,7 +64,7 @@ export function validate(body) {
 // The Redis key of a board. ARENA moved to board2 when it switched from
 // times to scores; FAST's times stay where they were.
 export function boardKey(mode) {
-  if (mode === 'fast') return 'od:board:fast';
+  if (mode === 'fast' || BOSSES.includes(mode)) return `od:board:${mode}`;
   return `od:board2:${mode}`;
 }
 
