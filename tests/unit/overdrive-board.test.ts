@@ -40,6 +40,31 @@ describe('OVERDRIVE leaderboard API', () => {
     expect(validate({ mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6 }).error).toBe('mode');
   });
 
+  it('keeps a time board per boss, fastest first', async () => {
+    expect(boardKey('boss0')).toBe('od:board:boss0');
+    expect(boardKey('boss5')).toBe('od:board:boss5');
+    expect(validate({ mode: 'boss1', name: 'ollie', time: 84.31, difficulty: 2 })).toEqual({ mode: 'boss1', name: 'OLLIE', time: 84.31, difficulty: 2 });
+    expect(validate({ mode: 'boss1', name: 'A', time: 5, difficulty: 2 }).error).toBe('time');
+    expect(validate({ mode: 'boss6', name: 'A', time: 90, difficulty: 2 }).error).toBe('mode');
+    vi.stubEnv('KV_REST_API_URL', 'https://redis.example'); vi.stubEnv('KV_REST_API_TOKEN', 't');
+    const calls: string[][][] = [];
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: { body: string }) => {
+      const cmds = JSON.parse(init.body);
+      calls.push(cmds);
+      const result = cmds.map((c: string[]) =>
+        c[0] === 'INCR' ? { result: 1 } : c[0] === 'ZRANGE' ? { result: [JSON.stringify({ n: 'OLLIE', d: 2 }), '84.31'] } : { result: 1 });
+      return { ok: true, json: async () => result };
+    }));
+    const res = mockRes();
+    await handler({ method: 'POST', body: { mode: 'boss1', name: 'ollie', time: 84.31, difficulty: 2 },
+                    headers: { 'x-forwarded-for': '9.9.9.9' } }, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.entries[0]).toEqual({ name: 'OLLIE', time: 84.31, difficulty: 2 });
+    const flat = calls.flat();
+    expect(flat.find((c) => c[0] === 'ZADD')?.[1]).toBe('od:board:boss1');
+    expect(flat.find((c) => c[0] === 'ZRANGE')).not.toContain('REV');
+  });
+
   it('reads Redis WITHSCORES replies', () => {
     expect(parseTop([JSON.stringify({ n: 'ollie', d: 2 }), '301.5', 'junk', '1'])).toEqual([{ name: 'OLLIE', time: 301.5, difficulty: 2 }]);
     expect(parseTop([JSON.stringify({ n: 'ollie', d: 1, t: 640.5, w: 0 }), '9100'], 'arena'))
