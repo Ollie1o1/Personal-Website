@@ -34,7 +34,7 @@ describe('OVERDRIVE leaderboard API', () => {
   });
 
   it('keeps one board per mode, and the old daily mode is gone', () => {
-    expect(boardKey('fast')).toBe('od:board:fast');
+    expect(boardKey('fast')).toBe('od:board3:fast');   // the three-wave Gauntlet's own board
     expect(boardKey('arena')).toBe('od:board2:arena');
     expect(boardKey('endless')).toBe('od:board2:endless');
     expect(validate({ mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6 }).error).toBe('mode');
