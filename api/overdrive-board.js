@@ -62,9 +62,12 @@ export function validate(body) {
 }
 
 // The Redis key of a board. ARENA moved to board2 when it switched from
-// times to scores; FAST's times stay where they were.
+// times to scores; FAST moved to board3 when the Gauntlet's rooms became two
+// waves and a mini-boss (the game's FAST_COURSE 3): the old times were set on
+// a shorter course. (The old boards are still in the store, just not read.)
 export function boardKey(mode) {
-  if (mode === 'fast' || BOSSES.includes(mode)) return `od:board:${mode}`;
+  if (mode === 'fast') return 'od:board3:fast';
+  if (BOSSES.includes(mode)) return `od:board:${mode}`;
   return `od:board2:${mode}`;
 }
 
