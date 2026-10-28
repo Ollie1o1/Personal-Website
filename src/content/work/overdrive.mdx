@@ -2,8 +2,8 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine. Two acts and an encore, eighteen enemy types including five bosses, four guns and a sword, a time trial, endless and boss modes, shared leaderboards and a soundtrack synthesized live. It also compiles to WebAssembly, so you can play it on this page.'
-description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts and an encore, thirteen enemy types and five bosses built as animated rigs made in Blender, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
+summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine. Two acts and an encore, twenty-five enemy types including six mini-bosses and six bosses, four guns and a sword, a time trial, endless and boss modes, shared leaderboards and a soundtrack synthesized live. It also compiles to WebAssembly, so you can play it on this page.'
+description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts and an encore, thirteen enemy types, six mini-bosses and six bosses built as animated rigs made in Blender, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Oct 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -31,7 +31,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 | --- | --- |
 | Modes | Arena, Fast (time trial), Endless, Boss, plus Act II after the final boss |
 | Arenas | 5 in Act I, 5 in Act II, an encore, and 7 time-trial rooms |
-| Enemies | 13 types, 3 Hollowed variants, 5 bosses (one with a second form) |
+| Enemies | 13 types, 3 Hollowed variants, 6 mini-bosses, 6 bosses (one with a second form) |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, and a sword |
 | Sound | 111 effects, about 125 synthesized enemy voices, music synthesized live |
 | Code | 269 commits since March 2026, about 32,000 lines of C++ |
@@ -44,7 +44,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 ### Five ways to play
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
-- **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, with a run clock, splits against your best run and par ranks.
+- **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die.
 - **Boss** lets you fight any boss on its own, straight into the fight with the upgrades a run would have by then, against your best kill time.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
@@ -128,7 +128,7 @@ That simplicity had a hole in it. Which way to push depended only on where the p
 
 Movement in a game like this is tuned by feel: jump height, dash distance, how much speed a grapple builds. If physics runs once per rendered frame, all of that changes with the monitor. A 144 Hz display jumps differently from a 60 Hz one. So simulation runs on a **fixed 1/60 s step**, fed by an accumulator of real elapsed time:
 
-<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Flow.h" lines="721-765" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = g_fixedDt > 0.0 ? g_fixedDt : (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\nif (g_devCam && g_devNoMouse) devCamera((float)elapsed);\naccumulator += elapsed * timeScale();   // (a wave's last kill: slow motion)\nif (slowT > 0.f) slowT -= (float)elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\n// ... read the keyboard through your key bindings, and a gamepad folded into the same keys ...\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    snapshotForInterpolation();\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
+<CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" file="src/game/Gameplay_Flow.h" lines="791-835" code={"Uint64 now = SDL_GetPerformanceCounter();\ndouble elapsed = g_fixedDt > 0.0 ? g_fixedDt : (double)(now - prevTicks) / (double)freq;\nprevTicks = now;\nif (g_devCam && g_devNoMouse) devCamera((float)elapsed);\naccumulator += elapsed * timeScale();   // (a wave's last kill: slow motion)\nif (slowT > 0.f) slowT -= (float)elapsed;\nif (accumulator > 0.25) accumulator = 0.25;\n\n// ... read the keyboard through your key bindings, and a gamepad folded into the same keys ...\n\nwhile (accumulator >= PHYSICS_DT) {\n    prevCamPos = player.camera.position;\n    snapshotForInterpolation();\n    if (hitStopFrames > 0) {\n        --hitStopFrames;  // freeze simulation, consume one tick\n    } else {\n        physicsTick(PHYSICS_DT, keys, parryKey);\n    }\n    accumulator -= PHYSICS_DT;\n}"} />
 
 (`g_fixedDt` is the footage mode: when recording the showcase video, every frame advances exactly 1/30 s however long it took to render.)
 
@@ -191,6 +191,8 @@ Fast mode reuses the same wave director with a flag, and took three tries:
 3. The Gauntlet: **rooms joined by boost tubes**. A tube is the breather: health waiting, nothing shooting, and a ribbed tunnel that fires you along at 26 m/s. Doors split open as you sprint at them, lock behind you when a room's fight starts, and the exit unlocks when the room is clear.
 
 The seven rooms are a canal between raised walkways, five terraces climbing 20 m, islands and ferries over a void, a tower you fall through floor by floor, a pump room opening into a hall with galleries, and a courtyard with a lift shaft up to the beacon. Tests check that no enemy is placed in a tube, that every fight waits for its room, that the route really does change direction and height, and that every placed enemy appears exactly once, exactly where it was placed.
+
+That version still played like an arena with a clock on it: every room was two waves of kill-everything, so your time was set by the slowest enemy to die, a sniper on a ledge or a bird circling overhead. The fourth pass rebuilt it around **a mini-boss in every room**. Kill it and the room is won: whatever is still standing falls apart with it, at a second on the clock each, so you choose between cleaning up and running. Each one asks for a different move, and each moves on an older enemy's skeleton at a bigger size with a body of its own made in Blender: the Courier runs from you up the canal with the room's key (hook it), the Bulwark hides behind a sluice gate (get behind it), the Cantor sweeps a beam down the terraces (climb through it), the Harrier skims low after a dive (hook it there), the Plumb Line opens its core after a volley, and the Foreman is shielded by its tethered crew. Second waves now always come from ahead of you. The run ends with **the Pacemaker**, a boss that races you up the tower's balconies to the beacon and tries to light it at the end. Every room has medals timed from its fight to its clear, and ROOM ATTACK runs any one room on its own for them. Headless tests run each mini-boss's mind in its own room and the Pacemaker up the tower, phase by phase, to its beacon.
 
 ### An enemy worth parrying
 
