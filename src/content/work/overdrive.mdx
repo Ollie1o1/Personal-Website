@@ -2,8 +2,8 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine. Two acts and an encore, twenty-five enemy types including six mini-bosses and six bosses, four guns and a sword, a time trial, endless and boss modes, shared leaderboards and a soundtrack synthesized live. It also compiles to WebAssembly, so you can play it on this page.'
-description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts and an encore, thirteen enemy types, six mini-bosses and six bosses built as animated rigs made in Blender, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
+summary: 'A fast 3D arena shooter written from scratch in C++ and OpenGL, with no engine. Two acts, an encore and a nine-room story chapter, twenty-seven enemy types including six mini-bosses and seven bosses, four guns and a sword, a time trial, endless and boss modes, shared leaderboards and a soundtrack synthesized live. It also compiles to WebAssembly, so you can play it on this page.'
+description: 'Case study: an engine-less 3D arena shooter in C++17 and OpenGL 3.3. Two acts, an encore and a nine-room story chapter, fourteen regular enemy types, six mini-bosses and seven bosses built as animated rigs made in Blender, a combo-fighting final boss with a second form, Quake-style movement, fixed 60 Hz physics with interpolated rendering, a positional sound mixer with synthesized enemy voices, procedural textures, guns made in Blender, a live balance panel, and a WebAssembly build playable in the browser.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Oct 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -11,10 +11,10 @@ repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
-  - { k: 'Enemy types', v: '18' }
+  - { k: 'Enemy types', v: '27' }
   - { k: 'Image files', v: '0' }
   - { k: 'Lines of C++', v: '32,000' }
-asOf: '2026-10-27'
+asOf: '2026-10-29'
 ---
 
 <OverdrivePlayer />
@@ -29,9 +29,9 @@ I built it to learn what an engine actually does for you. The answer turned out 
 
 | At a glance | |
 | --- | --- |
-| Modes | Arena, Fast (time trial), Endless, Boss, plus Act II after the final boss |
-| Arenas | 5 in Act I, 5 in Act II, an encore, and 7 time-trial rooms |
-| Enemies | 13 types, 3 Hollowed variants, 6 mini-bosses, 6 bosses (one with a second form) |
+| Modes | Arena, Story, Fast (time trial), Endless, Boss, plus Act II after the final boss |
+| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and 9 rooms in Story Chapter 1 |
+| Enemies | 14 regular types, 3 Hollowed variants, 6 mini-bosses, 7 bosses (one with a second form) |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, and a sword |
 | Sound | 111 effects, about 125 synthesized enemy voices, music synthesized live |
 | Code | 269 commits since March 2026, about 32,000 lines of C++ |
@@ -41,15 +41,24 @@ I built it to learn what an engine actually does for you. The answer turned out 
 
 ## The game
 
-### Five ways to play
+### Modes and campaigns
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
+- **Story** begins with **Chapter 1: THE CRADLE**, a continuous route through nine factory rooms as UNIT 24, a rejected robot looking for its creator. Wake on a furnace belt, find guns on earlier copies, climb to the Sorting Floor and confront the Sorter.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die.
 - **Boss** lets you fight any boss on its own, straight into the fight with the upgrades a run would have by then, against your best kill time.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
 
 Waves aren't always "kill everything": some ask you to hold a zone, destroy the pylons the enemies pour out of, or survive a reactor overload. The arenas also change as a fight goes on: the sun sets, the lava rises, the platforms speed up.
+
+### Story: The Cradle
+
+UNIT 24 wakes on a conveyor carrying rejected bodies into a furnace. The first-person boot sequence tests its optics and fingers, then hands control back: get off the belt. Its purpose field is empty.
+
+The route descends into a scrap pit, climbs through maintenance ducts and assembly catwalks, pauses in an archive, then continues through sleeping pods, a freight elevator and scanner gates. Weapons come from numbered wrecks. Their last logs and the archive's terminals tell the story in a line at a time; two hidden wrecks reward looking off the route. Room checkpoints keep the weapons and logs already found.
+
+At the top waits **the Sorter**, the inspection machine that rejected UNIT 24. Parry its white claw, leave the red stamp, and break line of sight to clear a scanner mark. Its three phases reverse the belts and release floor panels over the furnace. Its exposed core rewards a successful dodge or parry. Win, and its gate opens onto an ash wasteland under a red sky, with the creator's tower ahead. The chapter card records time, kills, style, deaths, rank and secrets.
 
 ### Act II
 
