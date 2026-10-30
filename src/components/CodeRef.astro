@@ -7,10 +7,11 @@ interface Props {
   repo: string;
   file: string;
   lines: string; // "120-138"
+  revision?: string;
 }
-const { code, lang, repo, file, lines } = Astro.props;
+const { code, lang, repo, file, lines, revision = 'HEAD' } = Astro.props;
 const [start, end] = lines.split('-');
-const href = `${repo}/blob/HEAD/${file}#L${start}${end ? `-L${end}` : ''}`;
+const href = `${repo}/blob/${revision}/${file}#L${start}${end ? `-L${end}` : ''}`;
 ---
 
 <figure class="coderef">

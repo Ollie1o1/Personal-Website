@@ -22,30 +22,30 @@ describe('OVERDRIVE leaderboard API', () => {
     expect(validate({ mode: 'fast', name: 'A', time: 600, difficulty: 1 })).toEqual({ mode: 'fast', name: 'A', time: 600, difficulty: 1 });
     expect(validate({ mode: 'arena', name: 'A', time: 600, difficulty: 1, score: 9000 }))
       .toEqual({ mode: 'arena', name: 'A', time: 600, difficulty: 1, score: 9000, wave: 0 });
-    expect(validate({ mode: 'arena', name: 'A', time: 20, difficulty: 1, score: 9000 }).error).toBe('time');
-    expect(validate({ mode: 'arena', name: 'A', time: 600, difficulty: 1 }).error).toBe('score');
-    expect(validate({ mode: 'arena', name: 'A', time: 600, difficulty: 1, score: maxScore('arena', 600, 0) + 1 }).error).toBe('score');
-    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 12000, wave: 9 }).score).toBe(12000);
-    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 900000, wave: 2 }).error).toBe('score');
-    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 900, wave: -1 }).error).toBe('wave');
-    expect(validate({ mode: 'sky', name: 'A', time: 600, difficulty: 1 }).error).toBe('mode');
-    expect(validate({ mode: 'fast', name: '!!', time: 600, difficulty: 1 }).error).toBe('name');
-    expect(validate({ mode: 'fast', name: 'A', time: 600, difficulty: 9 }).error).toBe('difficulty');
+    expect(validate({ mode: 'arena', name: 'A', time: 20, difficulty: 1, score: 9000 })).toEqual({ error: 'time' });
+    expect(validate({ mode: 'arena', name: 'A', time: 600, difficulty: 1 })).toEqual({ error: 'score' });
+    expect(validate({ mode: 'arena', name: 'A', time: 600, difficulty: 1, score: maxScore('arena', 600, 0) + 1 })).toEqual({ error: 'score' });
+    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 12000, wave: 9 })).toMatchObject({ score: 12000 });
+    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 900000, wave: 2 })).toEqual({ error: 'score' });
+    expect(validate({ mode: 'endless', name: 'A', time: 400, difficulty: 2, score: 900, wave: -1 })).toEqual({ error: 'wave' });
+    expect(validate({ mode: 'sky', name: 'A', time: 600, difficulty: 1 })).toEqual({ error: 'mode' });
+    expect(validate({ mode: 'fast', name: '!!', time: 600, difficulty: 1 })).toEqual({ error: 'name' });
+    expect(validate({ mode: 'fast', name: 'A', time: 600, difficulty: 9 })).toEqual({ error: 'difficulty' });
   });
 
   it('keeps one board per mode, and the old daily mode is gone', () => {
     expect(boardKey('fast')).toBe('od:board3:fast');   // the three-wave Gauntlet's own board
     expect(boardKey('arena')).toBe('od:board2:arena');
     expect(boardKey('endless')).toBe('od:board2:endless');
-    expect(validate({ mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6 }).error).toBe('mode');
+    expect(validate({ mode: 'daily', name: 'A', time: 300, difficulty: 1, score: 5000, wave: 6 })).toEqual({ error: 'mode' });
   });
 
   it('keeps a time board per boss, fastest first', async () => {
     expect(boardKey('boss0')).toBe('od:board:boss0');
     expect(boardKey('boss5')).toBe('od:board:boss5');
     expect(validate({ mode: 'boss1', name: 'ollie', time: 84.31, difficulty: 2 })).toEqual({ mode: 'boss1', name: 'OLLIE', time: 84.31, difficulty: 2 });
-    expect(validate({ mode: 'boss1', name: 'A', time: 5, difficulty: 2 }).error).toBe('time');
-    expect(validate({ mode: 'boss6', name: 'A', time: 90, difficulty: 2 }).error).toBe('mode');
+    expect(validate({ mode: 'boss1', name: 'A', time: 5, difficulty: 2 })).toEqual({ error: 'time' });
+    expect(validate({ mode: 'boss6', name: 'A', time: 90, difficulty: 2 })).toEqual({ error: 'mode' });
     vi.stubEnv('KV_REST_API_URL', 'https://redis.example'); vi.stubEnv('KV_REST_API_TOKEN', 't');
     const calls: string[][][] = [];
     vi.stubGlobal('fetch', vi.fn(async (_url: string, init: { body: string }) => {
