@@ -2,8 +2,8 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Two Story chapters, two arena acts and an encore, 28 enemy types, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
-description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Two Story chapters through the Cradle and the Dead Span, 28 enemy types, eight bosses, Quake-style movement, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
+summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Three Story chapters, two arena acts and an encore, 33 enemy types, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
+description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Three Story chapters through the Cradle, the Dead Span and the Living Ward, 33 enemy types, nine bosses, Quake-style movement, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Oct 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -11,9 +11,9 @@ repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
-  - { k: 'Enemy types', v: '28' }
-  - { k: 'Story checkpoints', v: '17' }
-  - { k: 'Lines of C++', v: '43,000' }
+  - { k: 'Enemy types', v: '33' }
+  - { k: 'Story checkpoints', v: '27' }
+  - { k: 'Lines of C++', v: '44,000' }
 asOf: '2026-10-31'
 ---
 
@@ -23,18 +23,18 @@ asOf: '2026-10-31'
 
 OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons and a style meter that rewards playing aggressively.
 
-There's no engine underneath. The game is about 43,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 9,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
+There's no engine underneath. The game is about 44,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 9,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
 
 I built it to learn what an engine actually does for you. The answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
 
 | At a glance | |
 | --- | --- |
 | Modes | Arena, Story, Fast (time trial), Endless, Boss, Act II and combat practice |
-| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and 17 Story checkpoints across two chapters |
-| Enemies | 14 regular types, 3 Hollowed variants, 6 mini-bosses, 8 bosses (one with a second form) |
+| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and 27 Story checkpoints across three chapters |
+| Enemies | 18 regular types, 3 Hollowed variants, 6 mini-bosses, 9 bosses (one with a second form) |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, and a sword |
-| Sound | 124 loaded effects, 294 synthesized voice cues, music synthesized live |
-| Code | About 43,000 lines of game C++ and 9,000 lines of tests |
+| Sound | 136 loaded effects, 332 synthesized voice cues, music synthesized live |
+| Code | About 44,000 lines of game C++ and 9,000 lines of tests |
 | Runs on | macOS, Windows, the browser (WebAssembly + WebGL2) |
 
 ---
@@ -44,10 +44,10 @@ I built it to learn what an engine actually does for you. The answer turned out 
 ### Modes and campaigns
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
-- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE** and **THE DEAD SPAN**. Escape nine connected factory rooms, defeat the Sorter, then carry your weapons into a wasteland of dead convoys, broken crossings and abandoned turbines. Both chapters are playable from the Story menu.
+- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN** and **THE LIVING WARD**. Escape nine connected factory rooms, defeat the Sorter, then carry your weapons into a wasteland of dead convoys, broken crossings and abandoned turbines. Then descend into a medical laboratory where the later rooms cross incompatible dimensions. All three chapters are playable from the Story menu.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die.
-- **Boss** offers nine fights across Arena, Fast and Story, including the Pacemaker, Sorter and Ballast, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
+- **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
 
 Waves aren't always "kill everything": some ask you to hold a zone, destroy the pylons the enemies pour out of, or survive a reactor overload. The arenas also change as a fight goes on: the sun sets, the lava rises, the platforms speed up.
@@ -78,15 +78,26 @@ The encounters change with the work. The convoy is one ambush across freight cov
   <figcaption>Ballast in its final phase. The marked lane stays visible while the grading blade is moving.</figcaption>
 </figure>
 
+### Story: The Living Ward
+
+Chapter 3 descends through ten medical testing rooms, from Admissions and Recovery to a quiet conservatory, a crossing over a deep pit and observation halls looking onto a nebula and an ocean trench. A first-person entry scene shows a routine motor test becoming impossible while its instruments keep reporting normal contact. Familiar beds, identification bands, service equipment and medical records recur as the surroundings change. The treatment floors stay bright, spacious and grounded.
+
+Four new flesh chassis families introduce committed lunges, armored support plates, suspended firing lanes and announced dimensional crossings. Gallery controls release assessment locks; the late observation contacts raise a chosen physical bridge. At the bottom waits **the Successor**: an agile near-human body with a mechanical face, three phases, cuttable Suture anchors and white strikes the player can parry. Its original 176 BPM score adds a four-part synthetic choir and organ to fast percussion. Defeating it opens a corridor into a fractured garden that the player can walk through to finish the chapter.
+
+<figure>
+  <img src="/work/overdrive-living-ward.png" width="1280" height="720" alt="A bright hospital observation hall beneath a vast glass roof, with a purple nebula, stars and drifting subjects beyond it." loading="lazy" decoding="async" style="width: 100%; height: auto;" />
+  <figcaption>Celestial Observation: the hospital continues beneath a sky it should never have reached.</figcaption>
+</figure>
+
 ### Checkpoints, practice and atmosphere
 
 Records open with **E** when you choose to read them. **Story → Continue** restores the latest saved checkpoint, equipment, upgrades, discoveries and defeated bosses. Saves stay on the current device or browser; starting a new Story run replaces that local slot. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and dialogue refer to particular jobs and failures along that route.
 
 **F3** on the main menu opens **Combat Practice**: eight repeatable lessons for parries, finishers, enemy grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the combat explanations during a run.
 
-Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: jump to any of the 17 checkpoints with the equipment needed for that point, optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
+Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: jump to any of the 27 checkpoints with the equipment needed for that point, optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
-Wind, drifting ash, falling grit, vent emissions and loose machinery give the route movement between fights. **Settings → Video → Ambient Detail** offers Off, Low, Medium and High, independently of resolution. Lowering it immediately removes optional particles and decorative work; press warnings, projectiles, targets and damaging wind fronts remain visible. Potion drops are rarer, and both Story bosses move faster and use follow-up attacks in their later phases.
+Wind, drifting ash, falling grit, vent emissions and loose machinery give the route movement between fights. **Settings → Video → Ambient Detail** offers Off, Low, Medium and High, independently of resolution. Lowering it immediately removes optional particles and decorative work; press warnings, projectiles, targets and damaging wind fronts remain visible. Potion drops are rarer, and the Story bosses move faster and use follow-up attacks in their later phases.
 
 **Settings → Gameplay → Enemy Markers** saves a choice of **Low** or **Detailed**. Low is the default: small icons above the last few enemies, with just one short direction or distance label when needed. Detailed keeps the full enemy names, distances and cover labels. Bosses and mini-bosses have no permanent tracking pings in either mode; health bars and attack warnings remain visible.
 
@@ -445,7 +456,7 @@ Every gun's stats, every enemy's and boss's health, speed and timing, OVERDRIVE 
 ### Measuring instead of guessing
 
 - A frame timer (`--bench`) prints a per-zone breakdown and the worst frames; `--skip sky,bloom,…` turns passes off to see what each one costs. It showed the game is GPU-fill-bound (the simulation takes about 0.1 ms).
-- `make test` checks physics, game logic, route traversal, objectives and boss fights with scripted players, without a GPU or window. `make scan` checks escape routes from arena bounds. Native `make test-dev` selects every Story checkpoint through the developer menu and renders its first gameplay frames after the handoff. It also checks real shots on turbine brakes, gate and retry behavior, and detail changes while paused. `make test-web-story` renders both Story boss previews in WebAssembly with a restricted stack to guard against browser-only overflows.
+- `make test` checks physics, game logic, route traversal, objectives and boss fights with scripted players, without a GPU or window. `make scan` checks escape routes from arena bounds. Native `make test-dev` selects every Story checkpoint through the developer menu and renders its first gameplay frames after the handoff. It also checks real shots on turbine brakes, gate and retry behavior, and detail changes while paused. `make test-web-story` renders all three Story boss previews in WebAssembly with a restricted stack to guard against browser-only overflows.
 - CI builds and tests every push on Linux, macOS and the web.
 
 ### What an audit turned up
@@ -463,7 +474,7 @@ Before putting the game in front of people I read it end to end and wrote the fi
 
 ## Results
 
-- **Playable campaigns and challenges:** two Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
+- **Playable campaigns and challenges:** three Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
 - **Gamepad support**, in the browser too.
 - **A soundtrack synthesized live** in the audio callback, with a track per area that builds from the tubes into each fight, plus gunshots built from CC0 recordings with a synthesized thump and ring under each, held to their recordings' body and brightness by a test.
 - **Consistent movement across refresh rates**, from 60 Hz to unlimited.

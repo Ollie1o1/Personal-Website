@@ -50,7 +50,7 @@ const release = digest.digest('hex').slice(0, 16);
 
   root.querySelector('[data-od-launch]').addEventListener('click', () => {
     const frame = document.createElement('iframe');
-    frame.src = `/overdrive/index.html?v=${root.dataset.odRelease}`; // start at the main menu, including both Story chapters
+    frame.src = `/overdrive/index.html?v=${root.dataset.odRelease}`; // start at the main menu, including all three Story chapters
     frame.title = 'OVERDRIVE (playable)';
     frame.allow = 'fullscreen; autoplay; pointer-lock';
     frame.allowFullscreen = true;
