@@ -13,8 +13,8 @@ stats:
   - { k: 'Physics rate', v: '60 Hz' }
   - { k: 'Enemy types', v: '28' }
   - { k: 'Story checkpoints', v: '17' }
-  - { k: 'Lines of C++', v: '42,000' }
-asOf: '2026-10-30'
+  - { k: 'Lines of C++', v: '43,000' }
+asOf: '2026-10-31'
 ---
 
 <OverdrivePlayer />
@@ -23,18 +23,18 @@ asOf: '2026-10-30'
 
 OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons and a style meter that rewards playing aggressively.
 
-There's no engine underneath. The game is about 42,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 9,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
+There's no engine underneath. The game is about 43,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 9,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
 
 I built it to learn what an engine actually does for you. The answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
 
 | At a glance | |
 | --- | --- |
-| Modes | Arena, Story, Fast (time trial), Endless, Boss, plus Act II after the final boss |
+| Modes | Arena, Story, Fast (time trial), Endless, Boss, Act II and combat practice |
 | Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and 17 Story checkpoints across two chapters |
 | Enemies | 14 regular types, 3 Hollowed variants, 6 mini-bosses, 8 bosses (one with a second form) |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, and a sword |
 | Sound | 124 loaded effects, 294 synthesized voice cues, music synthesized live |
-| Code | About 42,000 lines of game C++ and 9,000 lines of tests |
+| Code | About 43,000 lines of game C++ and 9,000 lines of tests |
 | Runs on | macOS, Windows, the browser (WebAssembly + WebGL2) |
 
 ---
@@ -47,7 +47,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 - **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE** and **THE DEAD SPAN**. Escape nine connected factory rooms, defeat the Sorter, then carry your weapons into a wasteland of dead convoys, broken crossings and abandoned turbines. Both chapters are playable from the Story menu.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die.
-- **Boss** lets you fight the six arena and time-trial bosses on their own, straight into the fight with the upgrades a run would have by then, against your best kill time.
+- **Boss** offers nine fights across Arena, Fast and Story, including the Pacemaker, Sorter and Ballast, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
 
 Waves aren't always "kill everything": some ask you to hold a zone, destroy the pylons the enemies pour out of, or survive a reactor overload. The arenas also change as a fight goes on: the sun sets, the lava rises, the platforms speed up.
@@ -56,7 +56,7 @@ Waves aren't always "kill everything": some ask you to hold a zone, destroy the 
 
 UNIT 24 wakes on a conveyor carrying rejected bodies into a furnace. The first-person boot sequence tests its optics and fingers, then hands control back: get off the belt. Its purpose field is empty.
 
-The route descends into a scrap pit, climbs through maintenance ducts and assembly catwalks, pauses in an archive, then continues through sleeping pods, a freight elevator and scanner gates. Weapons come from numbered wrecks. Their last logs and the archive's terminals tell the story in a line at a time; two hidden wrecks reward looking off the route. Room checkpoints keep the weapons and logs already found. Press Tab during play to spend earned upgrade points in the armory; upgrades carry through retries and into Chapter 2.
+The route descends into a scrap pit, climbs through maintenance ducts and assembly catwalks, pauses in an archive, then continues through sleeping pods, a freight elevator and scanner gates. Weapons come from numbered wrecks. Their last logs and the archive's terminals tell the story in a line at a time; two hidden wrecks reward looking off the route. Room checkpoints keep the weapons and logs already found; local autosaves let you resume after closing the game. Press Tab during play to spend earned upgrade points in the armory; upgrades carry through retries and into Chapter 2.
 
 At the top waits **the Sorter**, the inspection machine that rejected UNIT 24. Its carriage pursues while the scanner runs, then intercepts a predicted route with a committed gantry rush. Three physical press heads warn together and fall in sequence: amber targeting, a red lock with an audible tick, then a visible downstroke and retraction. Change route after the lock or parry the white claw. Later phases add staggered scrap volleys and burning furnace vents. Inspection shields can shatter under machinery impacts; four corner belt panels fail progressively while the connecting crosswalk and rails remain. Aimed hits into the open blue strip reward a successful dodge, while a parry staggers the machine. Win, and the gate opens onto an ash wasteland under a red sky. Continue from the chapter card with your equipment.
 
@@ -64,7 +64,7 @@ At the top waits **the Sorter**, the inspection machine that rejected UNIT 24. I
 
 Outside the factory, a road crew is still clearing a road nobody uses. The second chapter crosses eight checkpoints: an ash approach, a dead convoy, a buried relay, a broken span, a turbine graveyard, the last toll booths, the Cut and the far road. The Longshot is recovered from UNIT 11; optional wreck records describe failed repairs and interrupted journeys.
 
-The encounters change with the work. The convoy is one ambush across freight cover, with a sheltered route around it. At the relay, hold the service pad while a small security detail contests the repair. Cross the span by grapple or take the maintenance bypass. At the turbines, shoot three seized brake locks to restart the rotors and open the route; an upper maintenance deck offers another firing angle. Quiet stretches and optional records separate the fights.
+The encounters change with the work. The convoy is one ambush across freight cover, with a sheltered route around it. At the relay, hold the service pad while a small security detail contests the repair, or take a detour to isolate its security feed and stop reinforcements. Cross the span by grapple or take the maintenance bypass. At the turbines, shoot three seized brake locks to restart the rotors and open the route; an upper maintenance deck offers another firing angle and a winch control. Release its suspended counterweight to strike enemies in the warned drop zone, then use the landed load as cover. Quiet stretches and optional records separate the fights.
 
 **Ballast** works the Cut: a road grader on four articulated legs, carrying a turbine, a worn blade and a cable winch. It advances while lining up intercepting grading runs, then commits; failing brakes lead into a separately warned pivot and second pass. Jump its close blade sweep and flying asphalt, dash across the charge lane, or shelter from grit behind solid cover. Its white harpoon can be parried; shoot a caught cable to release it and expose the rear turbine. Physical impacts can shatter the marked windbreaks, changing the next approach. Each tool has its own warning and counter, and required attack visuals remain visible with ambient detail off.
 
@@ -80,7 +80,9 @@ The encounters change with the work. The convoy is one ambush across freight cov
 
 ### Checkpoints, practice and atmosphere
 
-Records open with **E** when you choose to read them. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and dialogue refer to particular jobs and failures along that route.
+Records open with **E** when you choose to read them. **Story → Continue** restores the latest saved checkpoint, equipment, upgrades, discoveries and defeated bosses. Saves stay on the current device or browser; starting a new Story run replaces that local slot. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and dialogue refer to particular jobs and failures along that route.
+
+**F3** on the main menu opens **Combat Practice**: eight repeatable lessons for parries, finishers, enemy grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the combat explanations during a run.
 
 Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: jump to any of the 17 checkpoints with the equipment needed for that point, optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
@@ -116,6 +118,8 @@ Beat him and he doesn't die. The eclipse swallows the ruin, the sky goes black u
 ### Scoring, guns and difficulty
 
 Every run is scored on style, speed and the damage you avoided, and a good enough score puts your name on that mode's leaderboard. Kills earn XP, scaled by how stylishly you play, and levels buy upgrades for the four guns: a revolver, a pump shotgun, a bolt rifle (the Lancer) and a heavy sniper rifle. They're built as one arsenal: blackened metal and bone, each glowing its own colour, with cells on the gun that show the rounds left.
+
+Each gun has two mutually exclusive mods. Choose extra revolver penetration or stronger precision hits, extra shotgun pellets or stronger movement recoil, headshot ammo refunds or airborne Lancer accuracy, and explosive Longshot impacts or deeper penetration. Buying the mod unlocks both choices; swapping is free. **M** (controller X) previews the alternative in the Armory.
 
 Four difficulties change how hard enemies hit, how fast they fire and how far they lead their shots.
 
@@ -459,7 +463,7 @@ Before putting the game in front of people I read it end to end and wrote the fi
 
 ## Results
 
-- **Playable campaigns and challenges:** two Story chapters, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
+- **Playable campaigns and challenges:** two Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
 - **Gamepad support**, in the browser too.
 - **A soundtrack synthesized live** in the audio callback, with a track per area that builds from the tubes into each fight, plus gunshots built from CC0 recordings with a synthesized thump and ring under each, held to their recordings' body and brightness by a test.
 - **Consistent movement across refresh rates**, from 60 Hz to unlimited.
