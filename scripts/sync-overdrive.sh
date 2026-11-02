@@ -6,6 +6,7 @@ set -e
 SRC="${1:-$(dirname "$0")/../../3d_shooter/web/dist}"
 DEST="$(dirname "$0")/../public/overdrive"
 [ -f "$SRC/overdrive.wasm" ] || { echo "no build at $SRC — run 'make web' in 3d_shooter"; exit 1; }
+[ -f "$SRC/build-info.json" ] || { echo "no release manifest at $SRC — rebuild OVERDRIVE before syncing"; exit 1; }
 rm -rf "$DEST" && mkdir -p "$DEST"
-cp "$SRC/index.html" "$SRC/overdrive.js" "$SRC/overdrive.wasm" "$SRC/overdrive.data" "$DEST/"
+cp "$SRC/index.html" "$SRC/overdrive.js" "$SRC/overdrive.wasm" "$SRC/overdrive.data" "$SRC/build-info.json" "$DEST/"
 echo "synced OVERDRIVE → public/overdrive ($(du -sh "$DEST" | cut -f1))"

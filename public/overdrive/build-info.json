@@ -1,0 +1,22 @@
+{
+  "build": "d8a915a9dc14",
+  "built_at": "2026-11-02T18:41:52.064210+00:00",
+  "assets": {
+    "overdrive.js": {
+      "sha256": "107d73e590922d319a387e62c21e148cc058369e28bc7eee51cef749ed8c264f",
+      "bytes": 219535
+    },
+    "overdrive.wasm": {
+      "sha256": "b36742d804fb45f980e5e579327ac959d35178d3b7be93adac4f5abacd1deb19",
+      "bytes": 4134980
+    },
+    "overdrive.data": {
+      "sha256": "9727592cfaf1ca6979f15040684f03c108b2b901992cea3c40df00d1d059e544",
+      "bytes": 20676147
+    },
+    "index.html": {
+      "sha256": "4df676df3a9c92b2b3e310baf60a8cf378a134e26465e3233196e8026c6380b2",
+      "bytes": 13471
+    }
+  }
+}

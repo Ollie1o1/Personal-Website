@@ -3,15 +3,12 @@
 // synced from 3d_shooter/web/dist by scripts/sync-overdrive.sh). It only loads
 // when asked for, inside an iframe to isolate keyboard and pointer lock.
 import { readFileSync, statSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 
 const files = ['index.html', 'overdrive.js', 'overdrive.wasm', 'overdrive.data'];
 const build = join(process.cwd(), 'public', 'overdrive');
 const size = (files.reduce((total, file) => total + statSync(join(build, file)).size, 0) / 1_000_000).toFixed(1);
-const digest = createHash('sha256');
-for (const file of files) digest.update(readFileSync(join(build, file)));
-const release = digest.digest('hex').slice(0, 16);
+const release = JSON.parse(readFileSync(join(build, 'build-info.json'), 'utf8')).build;
 ---
 
 <section class="od" id="play" data-od-release={release} aria-label="Playable OVERDRIVE build">
@@ -19,7 +16,7 @@ const release = digest.digest('hex').slice(0, 16);
     <span class="lamp" aria-hidden="true"></span>
     <span data-od-state>OVERDRIVE · not loaded</span>
     <span class="spacer"></span>
-    <span class="dim">WebAssembly + WebGL2 · {size} MB uncompressed</span>
+    <span class="dim">Build {release} · {size} MB</span>
   </header>
 
   <div class="stage" data-od-stage>
