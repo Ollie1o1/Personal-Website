@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OVERDRIVE</title>
-<meta name="overdrive-build" content="e43840720a4f">
+<meta name="overdrive-build" content="8a60f3a29eb3">
 <link rel="icon" href="data:,">
 <style>
   :root { color-scheme: dark; }
@@ -48,7 +48,7 @@
       <kbd>Esc</kbd> or <kbd>P</kbd> pause (click to recapture the mouse) ·
       fullscreen from the pause menu
     </span>
-    <span class="build">Build e43840720a4f</span>
+    <span class="build">Build 8a60f3a29eb3</span>
   </button>
 </div>
 <script>
@@ -60,13 +60,15 @@
 
   var Module = {
     canvas,
-    locateFile: (path, prefix) => `${prefix}${path}?v=e43840720a4f`,
+    locateFile: (path, prefix) => `${prefix}${path}?v=8a60f3a29eb3`,
     // ?play skips the main menu (same as ./shooter --play), ?fast starts the FAST
     // time trial, ?endless an ENDLESS run; ?arena=N starts at arena (or FAST section) N; ?dev opens the
     // dev level select
     arguments: (() => {
       const q = new URLSearchParams(location.search);
       const args = q.has('arena') ? ['--arena', q.get('arena')] : q.has('play') ? ['--play'] : [];
+      if (q.has('story4')) args.push('--story4');   // Chapter 4 (in progress): no menu entry yet
+      if (q.has('splinter')) args.push('--splinter');
       if (q.has('story3')) args.push('--story3');
       if (q.has('story2')) args.push('--story2');
       if (q.has('training')) args.push('--training');
@@ -248,6 +250,6 @@
   document.addEventListener('keydown', start, true);
   document.addEventListener('pointerlockchange', () => { if (document.pointerLockElement) start(); });
 </script>
-<script async src="overdrive.js?v=e43840720a4f"></script>
+<script async src="overdrive.js?v=8a60f3a29eb3"></script>
 </body>
 </html>
