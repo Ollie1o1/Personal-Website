@@ -33,7 +33,7 @@ const release = JSON.parse(readFileSync(join(build, 'build-info.json'), 'utf8'))
     <p class="keys">
       <kbd>WASD</kbd> move <kbd>Mouse</kbd> look <kbd>LMB</kbd> fire <kbd>RMB</kbd> aim (rifles)
       <kbd>Q</kbd> grapple <kbd>Space</kbd> jump <kbd>Shift</kbd> dash <kbd>Ctrl</kbd> slide <kbd>R</kbd> reload <kbd>1</kbd>–<kbd>4</kbd> weapons
-      <kbd>Tab</kbd> armory <kbd>F3</kbd> practice (main menu) <kbd>F4</kbd> field guide <kbd>G</kbd> grenade <kbd>F</kbd> parry <kbd>E</kbd> read / interact / finisher <kbd>Esc</kbd> pause (leave fullscreen from the pause menu, or hold <kbd>Esc</kbd>)
+      <kbd>Tab</kbd> armory <kbd>F3</kbd> practice (main menu) <kbd>F4</kbd> field guide <kbd>G</kbd> grenade / SPLINTER <kbd>X</kbd> RECALL (Story) <kbd>F</kbd> parry <kbd>E</kbd> read / interact / finisher <kbd>Esc</kbd> pause (leave fullscreen from the pause menu, or hold <kbd>Esc</kbd>)
     </p>
     <button type="button" class="fs" data-od-fullscreen hidden>Fullscreen</button>
   </div>
@@ -47,7 +47,7 @@ const release = JSON.parse(readFileSync(join(build, 'build-info.json'), 'utf8'))
 
   root.querySelector('[data-od-launch]').addEventListener('click', () => {
     const frame = document.createElement('iframe');
-    frame.src = `/overdrive/index.html?v=${root.dataset.odRelease}`; // start at the main menu, including all three Story chapters
+    frame.src = `/overdrive/index.html?v=${root.dataset.odRelease}`; // start at the main menu, including all five Story chapters
     frame.title = 'OVERDRIVE (playable)';
     frame.allow = 'fullscreen; autoplay; pointer-lock';
     frame.allowFullscreen = true;

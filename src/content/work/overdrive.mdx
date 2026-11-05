@@ -2,19 +2,19 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Three Story chapters, two arena acts and an encore, 33 enemy types, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
-description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Three Story chapters through the Cradle, the Dead Span and the Living Ward, 33 enemy types, nine bosses, Quake-style movement, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
+summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Five Story chapters, two arena acts and an encore, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
+description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Five Story chapters from a robot factory to a frozen planetary archive, Quake-style movement, distinct bosses, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
 role: 'Solo — design and implementation'
-timeline: 'Mar – Oct 2026'
+timeline: 'Mar – Nov 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
 repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
-  - { k: 'Enemy types', v: '33' }
-  - { k: 'Story checkpoints', v: '27' }
-  - { k: 'Lines of C++', v: '44,000' }
-asOf: '2026-10-31'
+  - { k: 'Story chapters', v: '5' }
+  - { k: 'Story starts', v: '46' }
+  - { k: 'Lines of C++', v: '60,000' }
+asOf: '2026-11-05'
 ---
 
 <OverdrivePlayer />
@@ -23,18 +23,18 @@ asOf: '2026-10-31'
 
 OVERDRIVE is an arena shooter in the spirit of ULTRAKILL: dashing, sliding, a grapple hook, parrying, several weapons and a style meter that rewards playing aggressively.
 
-There's no engine underneath. The game is about 44,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 9,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
+There's no engine underneath. The game is about 60,000 lines of C++17 and 1,000 lines of GLSL on top of SDL2 for windowing and input, OpenGL 3.3 Core for rendering and GLM for math, with another 12,000 lines of tests. It builds with a Makefile on macOS, on Windows through MSYS2, and for the browser with Emscripten, which is the build running above.
 
 I built it to learn what an engine actually does for you. The answer turned out to be mostly **time**: deciding when things happen matters more than how they're drawn.
 
 | At a glance | |
 | --- | --- |
 | Modes | Arena, Story, Fast (time trial), Endless, Boss, Act II and combat practice |
-| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and 27 Story checkpoints across three chapters |
-| Enemies | 18 regular types, 3 Hollowed variants, 6 mini-bosses, 9 bosses (one with a second form) |
-| Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, and a sword |
-| Sound | 136 loaded effects, 332 synthesized voice cues, music synthesized live |
-| Code | About 44,000 lines of game C++ and 9,000 lines of tests |
+| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and five Story chapters with 46 developer starts |
+| Enemies | Regular enemies, three Hollowed variants, six Gauntlet mini-bosses, and distinct Story and arena bosses |
+| Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, Oathbreaker, SPLINTER and RECALL |
+| Sound | Positional effects, synthesized enemy voices and live music |
+| Code | About 60,000 lines of game C++ and 12,000 lines of tests |
 | Runs on | macOS, Windows, the browser (WebAssembly + WebGL2) |
 
 ---
@@ -44,7 +44,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 ### Modes and campaigns
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
-- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN** and **THE LIVING WARD**. Escape nine connected factory rooms, defeat the Sorter, then carry your weapons into a wasteland of dead convoys, broken crossings and abandoned turbines. Then descend into a medical laboratory where the later rooms cross incompatible dimensions. All three chapters are playable from the Story menu.
+- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN**, **THE LIVING WARD**, **THE BLOOD MOON PLAIN** and **THE COLD STORE**. Escape a working factory, cross a failed evacuation route, descend through impossible medical wards, climb and enter a scrap titan, then reach a frozen archive where restored copies of you are kept. Equipment carries forward, with the grapple, Oathbreaker, SPLINTER and RECALL expanding how you fight. All five chapters are playable from the Story menu.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die.
 - **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
@@ -56,6 +56,13 @@ Waves aren't always "kill everything": some ask you to hold a zone, destroy the 
 
 UNIT 24 wakes on a conveyor carrying rejected bodies into a furnace. The first-person boot sequence tests its optics and fingers, then hands control back: get off the belt. Its purpose field is empty.
 
+The salvage bay is open and lit: before stepping into it, you can look down into the Scrap Pit and see UNIT 01 under its work light. Amber marks identify the safe descent to the first revolver. On the Assembly Hall floor, machining stations provide solid cover and climbable roofs between the production lines.
+
+<figure>
+  <img src="/work/overdrive-salvage.jpg" width="1280" height="720" alt="An open factory salvage bay with amber receiver lights and UNIT 01 holding the revolver on the landing below." loading="lazy" decoding="async" style="width: 100%; height: auto;" />
+  <figcaption>The first revolver is visible before the drop: follow the receiver lights down to UNIT 01.</figcaption>
+</figure>
+
 The route descends into a scrap pit, climbs through maintenance ducts and assembly catwalks, pauses in an archive, then continues through sleeping pods, a freight elevator and scanner gates. Weapons come from numbered wrecks. Their last logs and the archive's terminals tell the story in a line at a time; two hidden wrecks reward looking off the route. Room checkpoints keep the weapons and logs already found; local autosaves let you resume after closing the game. Press Tab during play to spend earned upgrade points in the armory; upgrades carry through retries and into Chapter 2.
 
 At the top waits **the Sorter**, the inspection machine that rejected UNIT 24. Its carriage pursues while the scanner runs, then intercepts a predicted route with a committed gantry rush. Three physical press heads warn together and fall in sequence: amber targeting, a red lock with an audible tick, then a visible downstroke and retraction. Change route after the lock or parry the white claw. Later phases add staggered scrap volleys and burning furnace vents. Inspection shields can shatter under machinery impacts; four corner belt panels fail progressively while the connecting crosswalk and rails remain. Aimed hits into the open blue strip reward a successful dodge, while a parry staggers the machine. Win, and the gate opens onto an ash wasteland under a red sky. Continue from the chapter card with your equipment.
@@ -64,7 +71,7 @@ At the top waits **the Sorter**, the inspection machine that rejected UNIT 24. I
 
 Outside the factory, a road crew is still clearing a road nobody uses. The second chapter crosses eight checkpoints: an ash approach, a dead convoy, a buried relay, a broken span, a turbine graveyard, the last toll booths, the Cut and the far road. The Longshot is recovered from UNIT 11; optional wreck records describe failed repairs and interrupted journeys.
 
-The encounters change with the work. The convoy is one ambush across freight cover, with a sheltered route around it. At the relay, hold the service pad while a small security detail contests the repair, or take a detour to isolate its security feed and stop reinforcements. Cross the span by grapple or take the maintenance bypass. At the turbines, shoot three seized brake locks to restart the rotors and open the route; an upper maintenance deck offers another firing angle and a winch control. Release its suspended counterweight to strike enemies in the warned drop zone, then use the landed load as cover. Quiet stretches and optional records separate the fights.
+The encounters change with the work. The convoy is one ambush across freight cover, with a sheltered ground route and a raised loading gantry reached by ramps at both ends. At the relay, hold the service pad while a small security detail contests the repair, or take a detour to isolate its security feed and stop reinforcements. Cross the span by grapple or take the maintenance bypass. At the turbines, shoot three seized brake locks to restart the rotors and open the route; an upper maintenance deck offers another firing angle and a winch control. Release its suspended counterweight to strike enemies in the warned drop zone, then use the landed load as cover. Quiet stretches and optional records separate the fights.
 
 **Ballast** works the Cut: a road grader on four articulated legs, carrying a turbine, a worn blade and a cable winch. It advances while lining up intercepting grading runs, then commits; failing brakes lead into a separately warned pivot and second pass. Jump its close blade sweep and flying asphalt, dash across the charge lane, or shelter from grit behind solid cover. Its white harpoon can be parried; shoot a caught cable to release it and expose the rear turbine. Physical impacts can shatter the marked windbreaks, changing the next approach. Each tool has its own warning and counter, and required attack visuals remain visible with ambient detail off.
 
@@ -80,7 +87,7 @@ The encounters change with the work. The convoy is one ambush across freight cov
 
 ### Story: The Living Ward
 
-Chapter 3 descends through ten medical testing rooms, from Admissions and Recovery to a quiet conservatory, a crossing over a deep pit and observation halls looking onto a nebula and an ocean trench. A first-person entry scene shows a routine motor test becoming impossible while its instruments keep reporting normal contact. Familiar beds, identification bands, service equipment and medical records recur as the surroundings change. The treatment floors stay bright, spacious and grounded.
+Chapter 3 descends through ten medical testing rooms, from Admissions and Recovery to a quiet conservatory, a crossing over a deep pit and observation halls looking onto a nebula and an ocean trench. A first-person entry scene shows a routine motor test becoming impossible while its instruments keep reporting normal contact. Familiar beds, identification bands, service equipment and medical records recur as the surroundings change. The treatment floors stay bright, spacious and grounded. Diagnostic stations have curved scanner hoops, marked assessment lanes and standable roofs; low connecting decks and ramps add fighting routes beneath the observation galleries.
 
 Four new flesh chassis families introduce committed lunges, armored support plates, suspended firing lanes and announced dimensional crossings. Gallery controls release assessment locks; the late observation contacts raise a chosen physical bridge. At the bottom waits **the Successor**: an agile near-human body with a mechanical face, three phases, cuttable Suture anchors and white strikes the player can parry. Its original 176 BPM score adds a four-part synthetic choir and organ to fast percussion. Defeating it opens a corridor into a fractured garden that the player can walk through to finish the chapter.
 
@@ -89,13 +96,23 @@ Four new flesh chassis families introduce committed lunges, armored support plat
   <figcaption>Celestial Observation: the hospital continues beneath a sky it should never have reached.</figcaption>
 </figure>
 
+### Story: The Blood Moon Plain
+
+The fourth chapter opens beneath a red moon on a plain of discarded machinery. The horizon rises into **the Gleaner**, a scrap titan whose eye was the moon. Fight across its limbs, ride the updraft onto its back, defeat the machines tethered to it, then enter its furnace interior and climb toward the eye. SPLINTER adds a thrown projectile that can redirect your shots. The chapter uses encounter checkpoints across one enormous moving subject.
+
+### Story: The Cold Store
+
+Chapter 5 reaches an ice shelf beneath a ringed planet, with frozen giants on the horizon and storage towers standing over a void. Grapple along the Hook Line, cross a Thaw Room whose heaters accelerate the enemies waking beneath them, and find restored copies of UNIT 24. RECALL leaves a frozen copy: return to its position and shatter it, or use its brief lure to draw ordinary enemies away.
+
+The Blast Chillers combine freezing vents with climbable service modules and sheltered flanks. Across the Frozen Sea, a lit relay shelter breaks the quiet walk toward DISPATCH 2. There, **24-K**, your restored factory copy, challenges the equipment and movement you have learned. Beyond it waits **the Restorer**, whose attacks rewind your position, restore its own damage and shelve your weapons until you break them free.
+
 ### Checkpoints, practice and atmosphere
 
 Records open with **E** when you choose to read them. **Story → Continue** restores the latest saved checkpoint, equipment, upgrades, discoveries and defeated bosses. Saves stay on the current device or browser; starting a new Story run replaces that local slot. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and dialogue refer to particular jobs and failures along that route.
 
 **F3** on the main menu opens **Combat Practice**: eight repeatable lessons for parries, finishers, enemy grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the combat explanations during a run.
 
-Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: jump to any of the 27 checkpoints with the equipment needed for that point, optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
+Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: choose among 46 Story starts, including the Gleaner’s encounter checkpoints, with the equipment needed for that point; optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
 Wind, drifting ash, falling grit, vent emissions and loose machinery give the route movement between fights. **Settings → Video → Ambient Detail** offers Off, Low, Medium and High, independently of resolution. Lowering it immediately removes optional particles and decorative work; press warnings, projectiles, targets and damaging wind fronts remain visible. Potion drops are rarer, and the Story bosses move faster and use follow-up attacks in their later phases.
 
@@ -122,7 +139,7 @@ Every strike can be read two ways:
 - **By colour.** White means parry, gold means dodge or block, red means get out of the way.
 - **By ear.** A wind-up rises into the blow, a cue lands on the beat to act on (a bright ting to parry, a low doom to dodge, a double pulse to get out), then a boom whether it lands or not.
 
-Up there, and only there, you get a sword: combos and a charged thrust that heal you as they land, plus a parry and block on the right mouse button.
+The encore equips Oathbreaker, a sword also recovered in Story’s Final Assessment: combos and a charged thrust that heal you as they land, plus a parry and block on the right mouse button.
 
 Beat him and he doesn't die. The eclipse swallows the ruin, the sky goes black under a ring of fire, and he comes back as **MorningStar**, half again his size, blood orange with white eyes, for a second fight harder and longer than the first. Only the strikes to parry still show on his body. Everything else is read from the floor: rings to jump, cracks to step off, lanes of fire to stand between.
 
@@ -474,7 +491,7 @@ Before putting the game in front of people I read it end to end and wrote the fi
 
 ## Results
 
-- **Playable campaigns and challenges:** three Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
+- **Playable campaigns and challenges:** five Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
 - **Gamepad support**, in the browser too.
 - **A soundtrack synthesized live** in the audio callback, with a track per area that builds from the tubes into each fight, plus gunshots built from CC0 recordings with a synthesized thump and ring under each, held to their recordings' body and brightness by a test.
 - **Consistent movement across refresh rates**, from 60 Hz to unlimited.
