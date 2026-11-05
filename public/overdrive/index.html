@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OVERDRIVE</title>
-<meta name="overdrive-build" content="50b31fba66b8">
+<meta name="overdrive-build" content="7e54368f4053">
 <link rel="icon" href="data:,">
 <style>
   :root { color-scheme: dark; }
@@ -48,7 +48,7 @@
       <kbd>Esc</kbd> or <kbd>P</kbd> pause (click to recapture the mouse) ·
       fullscreen from the pause menu
     </span>
-    <span class="build">Build 50b31fba66b8</span>
+    <span class="build">Build 7e54368f4053</span>
   </button>
 </div>
 <script>
@@ -60,7 +60,7 @@
 
   var Module = {
     canvas,
-    locateFile: (path, prefix) => `${prefix}${path}?v=50b31fba66b8`,
+    locateFile: (path, prefix) => `${prefix}${path}?v=7e54368f4053`,
     // ?play skips the main menu (same as ./shooter --play), ?fast starts the FAST
     // time trial, ?endless an ENDLESS run; ?arena=N starts at arena (or FAST section) N; ?dev opens the
     // dev level select
@@ -250,6 +250,6 @@
   document.addEventListener('keydown', start, true);
   document.addEventListener('pointerlockchange', () => { if (document.pointerLockElement) start(); });
 </script>
-<script async src="overdrive.js?v=50b31fba66b8"></script>
+<script async src="overdrive.js?v=7e54368f4053"></script>
 </body>
 </html>
