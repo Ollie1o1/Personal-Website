@@ -49,7 +49,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 - **Endless** throws generated waves at you in the reactor until you die.
 - **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
-- **Combat practice** opens with **F3**: eight repeatable lessons for parries, finishers, grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. **F4** opens the Field Guide during a run.
+- **Combat practice** opens with **F3**: twenty repeatable lessons covering parries, finishers, grapples, shotgun jumps, grenade punches, Overdrive, sword combos and defence, SPLINTER, RECALL, precision, movement and free practice. **F4** opens the Field Guide during a run.
 
 Waves aren't always "kill everything": some ask you to hold a zone, destroy the pylons the enemies pour out of, or survive a reactor overload. The arenas also change as a fight goes on: the sun sets, the lava rises, the platforms speed up.
 
@@ -111,7 +111,9 @@ The Blast Chillers combine freezing vents with climbable service modules and she
 
 Records open with **E** when you choose to read them. **Story → Continue** restores the latest saved checkpoint, equipment, upgrades, discoveries and defeated bosses. Saves stay on the current device or browser; starting a new Story run replaces that local slot. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and optional records refer to particular jobs and failures along that route. Boss introductions show the name alone; brief mechanic warnings leave the fight visible.
 
-**F3** on the main menu opens **Combat Practice**: eight repeatable lessons for parries, finishers, enemy grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the combat explanations during a run.
+**F3** on the main menu opens **Combat Practice**: twenty repeatable lessons for the guns, movement, parries, finishers, sword combos and defence, SPLINTER and RECALL. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the three-page combat explanations during a run.
+
+Quick jump, dash and parry taps are retained between physics ticks. Weapon selections can change during a switch without restarting its timer, and a trigger tapped during the draw belongs to the selected gun. Critical-hit and kill confirmations remain visible through later ordinary or blocked contacts.
 
 Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: choose among 46 Story starts, including the Gleaner’s encounter checkpoints, with the equipment needed for that point; optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
@@ -345,7 +347,7 @@ The frame renders to an offscreen framebuffer, with enemy parts grouped into ins
 
 <CodeRef lang="cpp" repo="https://github.com/Ollie1o1/3d_shooter" revision="d901a6a8246cb0f61694067ed331d7a399837903" file="src/render/PostProcess.h" lines="219-228" code={"bool horizontal = true;\nfor (int i=0;i<10;++i) {\n    glBindFramebuffer(GL_FRAMEBUFFER,bloomFBO[horizontal?1:0]);\n    blurShader.use();\n    blurShader.setInt(\"image\",0);\n    blurShader.setInt(\"horizontal\",horizontal?1:0);\n    glBindTexture(GL_TEXTURE_2D,bloomTex[horizontal?0:1]);\n    drawQuad();\n    horizontal = !horizontal;\n}"} />
 
-The optional CRT pass adds barrel distortion, chromatic aberration and scanlines on top, before the HUD and the weapon view model are drawn.
+The weapon view model is drawn into the scene so it receives bloom. The optional CRT pass adds barrel distortion, chromatic aberration and scanlines before the HUD is drawn.
 
 Everything renders into a 16:9 canvas at a fixed resolution and is then scaled into the window, while the HUD lays itself out in a virtual 1280×720. That makes resolution a single number, and the **graphics quality** setting picks it: 720p, 1080p, 1440p or 4K. Rendering above the screen's own resolution is supersampling.
 
@@ -474,6 +476,10 @@ All that geometry swelled the model files to 8.3 MB, mostly with copies: Blender
 Every gun's stats, every enemy's and boss's health, speed and timing, OVERDRIVE and the four difficulties are named in one table that points straight at the values the game reads. A panel on F1 (Dear ImGui, desktop builds only) freezes the game to change them live, and saves what changed to a text file that the game and the tests both load at startup, so the tests check the numbers that ship.
 
 ### Measuring instead of guessing
+
+The latest performance pass batches glass and light-shaft uploads before drawing, culls fully offscreen animated parts, and instances the guns and articulated hands while preserving their draw order. One revolver pose keeps all 385 parts but submits them in one draw. Shared collision queries return each nearby wall once, projectile checks use complete travel segments, and frequently used result buffers retain their storage.
+
+On an Apple M2 at 720p with 4× MSAA, repeated native benchmarks measured additional average-FPS gains of about 12% in Core combat, 16% in the Living Ward and 6% in the Cold Store after the initial glass/culling fix. The Cold Store's 1% lows worsened in longer measurements, so these are average-throughput improvements rather than a claim of uniformly smoother frame pacing. [The full measurements and validation notes](https://github.com/Ollie1o1/3d_shooter/blob/main/docs/shared-systems.md) include the settings and tradeoff; browser frame rates were not measured.
 
 - A frame timer (`--bench`) prints a per-zone breakdown and the worst frames; `--skip sky,bloom,…` turns passes off to see what each one costs. It showed the game is GPU-fill-bound (the simulation takes about 0.1 ms).
 - `make test` checks physics, game logic, route traversal, objectives and boss fights with scripted players, without a GPU or window. `make scan` checks escape routes from arena bounds. Native `make test-dev` selects every Story checkpoint through the developer menu and renders its first gameplay frames after the handoff. It also checks real shots on turbine brakes, gate and retry behavior, and detail changes while paused. `make test-web-story` renders all three Story boss previews in WebAssembly with a restricted stack to guard against browser-only overflows.
