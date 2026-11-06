@@ -49,7 +49,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 - **Endless** throws generated waves at you in the reactor until you die.
 - **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard.
 - **Act II** unlocks when you kill the final boss: a second campaign beneath the first.
-- **Combat practice** opens with **F3**: 20 repeatable lessons, including sword combos and ripostes, SPLINTER chains, RECALL, movement and gun techniques. **F4** opens the three-page Field Guide during a run.
+- **Combat practice** opens with **F3**: eight repeatable lessons for parries, finishers, grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. **F4** opens the Field Guide during a run.
 
 Waves aren't always "kill everything": some ask you to hold a zone, destroy the pylons the enemies pour out of, or survive a reactor overload. The arenas also change as a fight goes on: the sun sets, the lava rises, the platforms speed up.
 
@@ -90,7 +90,7 @@ The encounters change with the work. The convoy is one ambush across freight cov
 
 Chapter 3 descends through ten medical testing rooms, from Admissions and Recovery to a quiet conservatory, a crossing over a deep pit and observation halls looking onto a nebula and an ocean trench. A first-person entry scene shows a routine motor test becoming impossible while its instruments keep reporting normal contact. Familiar beds, identification bands, service equipment and medical records recur as the surroundings change. The treatment floors stay bright, spacious and grounded. Diagnostic stations have curved scanner hoops, marked assessment lanes and standable roofs; low connecting decks and ramps add fighting routes beneath the observation galleries.
 
-Four new flesh chassis families introduce committed lunges, armored support plates, suspended firing lanes and announced dimensional crossings. Gallery controls release assessment locks; the late observation contacts raise a chosen physical bridge. At the bottom waits **the Successor**: an agile near-human body with a mechanical face, three phases, cuttable Suture anchors and white strikes the player can parry. Its original 176 BPM score adds a four-part synthetic choir and organ to fast percussion. Defeating it opens a corridor into a fractured garden that the player can walk through to finish the chapter.
+Four new flesh chassis families introduce committed lunges, armored support plates, suspended firing lanes and announced dimensional crossings. Gallery controls release assessment locks; the late observation contacts raise a chosen physical bridge. At the bottom waits **the Successor**: an agile near-human body with a mechanical face, three phases, cuttable Suture anchors and white strikes the player can parry. Its attacks now move through distinct wind-ups, strikes and recovery poses, with effects following the animated hands. Its original 176 BPM score adds a four-part synthetic choir and organ to fast percussion. Defeating it opens a corridor into a fractured garden that the player can walk through to finish the chapter.
 
 <figure>
   <img src="/work/overdrive-living-ward.png" width="1280" height="720" alt="A bright hospital observation hall beneath a vast glass roof, with a purple nebula, stars and drifting subjects beyond it." loading="lazy" decoding="async" style="width: 100%; height: auto;" />
@@ -111,7 +111,7 @@ The Blast Chillers combine freezing vents with climbable service modules and she
 
 Records open with **E** when you choose to read them. **Story → Continue** restores the latest saved checkpoint, equipment, upgrades, discoveries and defeated bosses. Saves stay on the current device or browser; starting a new Story run replaces that local slot. Checkpoint retries retain the weapons and records already found. Story combat alternates ambushes, repairs, moving machinery and traversal rather than repeating three waves in every room. The wrecks, signs and optional records refer to particular jobs and failures along that route. Boss introductions show the name alone; brief mechanic warnings leave the fight visible.
 
-**F3** on the main menu opens **Combat Practice**: 20 repeatable lessons covering the original parries, finishers, grapples, shotgun jumps, grenade punches, Overdrive and movement, plus sword defence and ripostes, SPLINTER redirects and chains, RECALL, slide kicks, slams, precision shots, alt fire and shield counters. Targets return after death, damage cannot kill you, and free practice includes the expanded arsenal. **F4**, or Pause → Field Guide, reopens the paged explanations during a run.
+**F3** on the main menu opens **Combat Practice**: eight repeatable lessons for parries, finishers, enemy grapples, shotgun jumps, grenade punches, Overdrive, movement and free practice. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the combat explanations during a run.
 
 Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: choose among 46 Story starts, including the Gleaner’s encounter checkpoints, with the equipment needed for that point; optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
@@ -133,7 +133,7 @@ Act II brings its own enemies: a Revenant whose soul flees to another relic when
 
 ### The encore: the Absolute
 
-Kill the Leviathan and the eclipse breaks. You rise into **!!!!!**, a floating ruin at sunset, for an encore against **the Absolute**: a figure of white light with red eyes who is faster than you and fights like a boxer. He throws jabs, crosses, hooks, spinning backfists, roundhouse kicks and haymakers strung into combos, and he flies, crashing down onto a circle marked under you or diving fist first.
+Kill the Leviathan and the eclipse breaks. You rise into **!!!!!**, a floating ruin at sunset, for an encore against **the Absolute**: a figure of white light with red eyes who is faster than you and fights like a boxer. He throws jabs, crosses, hooks, spinning backfists, roundhouse kicks and haymakers strung into combos, and he flies, crashing down onto a circle marked under you or diving fist first. Landings plant his feet in an asymmetric stance before he returns to guard, and his ray attack draws back before extending toward its target.
 
 Every strike can be read two ways:
 
@@ -316,8 +316,6 @@ The awkward part was making sure no glide runs one relic through another. With e
 
 The test that checks you can't cheese the new enemies found something worse: every walking enemy stepped straight off its relic into the void within a few seconds. Their edge check treated anything near their own floor height as solid, and on a relic their floor *is* the relic's top, so open air looked as safe as stone. Over a void, enemies now only step where something is really under them.
 
-A later pass caught a separate floor bug: the live game was handing Reliquary walkers world Y=0 and initializing flyers against the abyss. Both now use the actual platform beneath them. Spawns, escorts and Revenant returns check their whole body and supported feet; falling returns you to a clear spot on the moving relic, including when its centre holds a raised dais. Brick, furnace plate, marble and reactor circuitry now distinguish the four fragments, with lit landing edges and ruins framing the void.
-
 ### A colossus that couldn't touch you
 
 The Penitent's rules are all relative to the floor it stands on: a low sweep hits you if your feet are within a metre of that floor, its shockwaves hug it, and it lashes a chain at you if you perch more than 4 m above it. The tests built it standing on the pit's floor and every rule passed. In the game it was harmless.
@@ -361,7 +359,7 @@ On top of that, **anti-aliasing** (4x MSAA by default) keeps the thin neon lines
 
 ### Sound from somewhere
 
-The combat score now runs on fast techno and DnB: 170–178 BPM breaks, ghost snares, moving Reese bass and separate four-to-the-floor passages. Material impacts distinguish steel, stone, wood and ice. Normal and heavy parries briefly dip the background so the reward cuts through, while enemy warning sounds remain audible.
+The menu has its own track, **AFTER HOURS**: a steady 150 BPM pulse in low A minor. Switching between the menu and a level fades the old track out and clears its effects and rewind history before the next score begins.
 
 For most of its life the game played every sound effect the same way: through SDL_mixer's channels, at a fixed volume, in both ears. An enemy winding up behind you sounded exactly like one in front of you. So the effects now go through a mixer of my own, running in the same audio callback that already synthesizes the music.
 
@@ -426,8 +424,6 @@ Above what the GPU can keep up with, a pacer stops the CPU from queueing frames 
 
 ### Fights that hit back
 
-- **Steel on contact.** Oathbreaker uses real blade recordings, with damage, sparks, sound and recoil timed to the blade crossing its target. Ordinary cuts briefly hold the weapon while movement continues; blocked hits get a different marker and clang. A short gold trail on boss health makes each chunk of damage visible.
-- **Inputs that carry through.** A fire press just before a reload or switch finishes is remembered for the correct gun. A dash press can bridge the last recharge ticks. Both use a short buffer and clear when you pause.
 - **Every round shoves.** The push is the gun's force over the enemy's mass: a magnum round rocks a Husk back half a metre, a point-blank shotgun blast lifts it off its feet, a Brute barely moves.
 - **Stuns cancel attacks.** Enough damage close together breaks an enemy's footing and cancels its wind-up, so two shotgun blasts in a row stop a Brute's slam.
 - **Finishers.** A badly hurt or stunned enemy glows, and a finisher takes it for health and a full magazine. It used to share the parry key; after playing it I found the parry kept winning, so it has its own key now.
