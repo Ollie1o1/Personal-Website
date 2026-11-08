@@ -9,4 +9,6 @@ DEST="$(dirname "$0")/../public/overdrive"
 [ -f "$SRC/build-info.json" ] || { echo "no release manifest at $SRC — rebuild OVERDRIVE before syncing"; exit 1; }
 rm -rf "$DEST" && mkdir -p "$DEST"
 cp "$SRC/index.html" "$SRC/overdrive.js" "$SRC/overdrive.wasm" "$SRC/overdrive.data" "$SRC/build-info.json" "$DEST/"
+# Emscripten can mark .wasm executable; every file here is served as static data.
+chmod 644 "$DEST"/*
 echo "synced OVERDRIVE → public/overdrive ($(du -sh "$DEST" | cut -f1))"
