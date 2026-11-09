@@ -90,6 +90,13 @@ The encounters change with the work. The convoy is one ambush across freight cov
 
 Motor Assessment now has climbable diagnostic banks and shorter exposed crossings, plus an optional load release on the west gallery. Bait enemies beneath its marked drop zone, release the load after its warning, then use the landed machinery as cover. A service record on an upper bank rewards exploring the new route.
 
+Surgical Observation adds a low crossing beneath the operating lamps, with a ramp at each end and climbable sterilisation banks around the floor. The route gives you another way across the theatre while solid machinery interrupts its long firing lanes. Both waves and the observation galleries remain part of the fight.
+
+<figure>
+  <img src="/work/overdrive-surgical-observation.jpg" width="1280" height="720" alt="Surgical Observation's bright theatre, with climbable sterilisation banks, a low amber-edged crossing beneath operating lamps, and ramps to the observation galleries." loading="lazy" decoding="async" style="width: 100%; height: auto;" />
+  <figcaption>Surgical Observation: cross beneath the lamps or take the galleries above the treatment floor.</figcaption>
+</figure>
+
 Chapter 3 descends through ten medical testing rooms, from Admissions and Recovery to a quiet conservatory, a crossing over a deep pit and observation halls looking onto a nebula and an ocean trench. A first-person entry scene shows a routine motor test becoming impossible while its instruments keep reporting normal contact. Familiar beds, identification bands, service equipment and medical records recur as the surroundings change. The treatment floors stay bright, spacious and grounded. Diagnostic stations have curved scanner hoops, marked assessment lanes and standable roofs; low connecting decks and ramps add fighting routes beneath the observation galleries.
 
 Four new flesh chassis families introduce committed lunges, armored support plates, suspended firing lanes and announced dimensional crossings. Gallery controls release assessment locks; the late observation contacts raise a chosen physical bridge. At the bottom waits **the Successor**: an agile near-human body with a mechanical face, three phases, cuttable Suture anchors and white strikes the player can parry. Its attacks now move through distinct wind-ups, strikes and recovery poses, with effects following the animated hands. Its original 176 BPM score adds a four-part synthetic choir and organ to fast percussion. Defeating it opens a corridor into a fractured garden that the player can walk through to finish the chapter.
@@ -118,6 +125,8 @@ Records open with **E** when you choose to read them. **Story → Continue** res
 **F3** on the main menu opens **Combat Practice**: twenty repeatable lessons for the guns, movement, parries, finishers, sword combos and defence, SPLINTER and RECALL. Targets return after death, damage cannot kill you, and the Armory is available for experimenting. **F4**, or Pause → Field Guide, reopens the three-page combat explanations during a run.
 
 Quick jump, dash and parry taps are retained between physics ticks. Weapon selections can change during a switch without restarting its timer, and a trigger tapped during the draw belongs to the selected gun. Critical-hit and kill confirmations remain visible through later ordinary or blocked contacts.
+
+Death cards now identify supported damage sources and offer a short counter: parry a white cleave, leave a marked floor attack, or get clear of a freezing vent. The advice follows the contact that landed, including shots whose shooter has already died. Unknown contacts leave the advice blank.
 
 Press **F2** or **backtick** on the main menu for the developer level select. Story joins Arena and Fast there: choose among 46 Story starts, including the Gleaner’s encounter checkpoints, with the equipment needed for that point; optionally enable god mode, use **F5** to clear the current encounter and **F6** to refill health. Practice runs do not enter the leaderboards.
 
@@ -191,6 +200,8 @@ Four difficulties change how hard enemies hit, how fast they fire and how far th
 </Figure>
 
 Game code is organised as states (menu, gameplay) that own their systems. The source is split by job: `core/`, `game/`, `player/`, `enemies/`, `world/`, `render/`, `audio/`, `ui/`, and one folder per boss holding its state, its mind, its hazards and its arena logic.
+
+Cosmetic effects have their own random sequence, so changing ambient detail or the number of particles cannot consume the random draws used by AI, weapon spread and loot. A headless regression runs the same real AI with effects off, reduced and full, and checks that its movement, attack events and gameplay random draws match. Enemy animation phases stay with the simulation because they also affect movement and animated hitboxes.
 
 Collision is deliberately simple. The player and every wall or platform are axis-aligned boxes, overlaps are resolved by pushing the player out along the axis of least penetration, and a spatial grid, rebuilt whenever the level's walls change, keeps each query to nearby geometry.
 
