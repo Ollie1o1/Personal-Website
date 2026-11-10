@@ -383,6 +383,8 @@ On top of that, **anti-aliasing** (4x MSAA by default) keeps the thin neon lines
 
 The menu has its own track, **AFTER HOURS**: a steady 150 BPM pulse in low A minor. Switching between the menu and a level fades the old track out and clears its effects and rewind history before the next score begins.
 
+**SUNSET** now carries an eight-bar call-and-answer theme during ordinary combat, inside a sixteen-bar arrangement. **ZENITH** and **MORNINGSTAR** develop a related boss theme over thirty-two bars, with different acid figures, half-time breakdowns, filtered builds and peaks. They are still synthesized live, so Overdrive, the last enemy and wave clears can change the mix while the composition continues. Offline renders check the complete arrangements at three sample rates; gameplay captures also verify headroom at the final output.
+
 For most of its life the game played every sound effect the same way: through SDL_mixer's channels, at a fixed volume, in both ears. An enemy winding up behind you sounded exactly like one in front of you. So the effects now go through a mixer of my own, running in the same audio callback that already synthesizes the music.
 
 - **48 voices in four groups** (the player, enemies, the world, the UI), each with a cap, so a crowd of dying enemies can't drown out your own gun or the boss.
