@@ -14,7 +14,7 @@ stats:
   - { k: 'Story chapters', v: '5' }
   - { k: 'Story starts', v: '46' }
   - { k: 'Lines of C++', v: '60,000' }
-asOf: '2026-11-09'
+asOf: '2026-11-11'
 ---
 
 <OverdrivePlayer />
@@ -260,7 +260,9 @@ That only works if the player can read it, so every enemy is a rig of boxes on j
 
 Each rig is 11 to 42 boxes. The Leviathan, a serpent of fourteen plated segments, is 124, and the Absolute, a human-sized figure with jointed fingers, ribs, rune-lit gauntlets and a broken halo, is 168. All of them, plus death debris, projectiles, doors and jump pads, go to the GPU as **one instanced draw call**.
 
-The Absolute taught me the walk cycle has to be tied to the ground, not the clock. He places himself rather than going through the physics step, so his cycle never advanced and he glided across the floor with his legs held mid-stride. His steps now advance by the distance he actually covers, one stride per stride's length, so his feet stay planted.
+The Absolute taught me the walk cycle has to be tied to the ground, not the clock. He places himself rather than going through the physics step, so his cycle never advanced and he glided across the floor with his legs held mid-stride. His steps now advance by the distance he actually covers, one stride per stride's length.
+
+That fixed the cycle but not the feet. Drawing film strips of the rig and measuring them showed a planted foot still sliding 106 to 137% of the ground he covered, because the legs were posed from the hips and went wherever the pelvis did. Now a foot stays where it was put in the world and steps once the body has moved off it, with the leg solved backwards from the foot. A test holds the slide under 0.5% at 30, 60, 120 and 240 Hz. MORNINGSTAR is the same body with slower, looser springs, so his trunk runs past a stop and takes a moment to settle. The Successor and the Sovereign got sprung bodies and hit recoil but still pose their legs from the hips. A hash of every attack and wind-up length each boss starts over two minutes matches the build before the change, so the fights play the same.
 
 Waves are run by a small director that keeps 6 to 10 enemies on the field and trickles the rest in, away from the player:
 
@@ -269,6 +271,14 @@ Waves are run by a small director that keeps 6 to 10 enemies on the field and tr
 Counting the squad as alive the moment it spawns is a bug fix. Without it, the wave-clear check right below compared against the alive count from *before* the spawn, so a wave whose last enemy spawned into an empty field ended instantly. The boss wave is a single enemy, so it always did.
 
 The director and the enemy AI have no OpenGL in them, which is what made this findable: a headless test drives the director through an entire simulated run, and a regression test now holds the boss wave open while the boss is alive.
+
+### Enemies that find a way round
+
+For most of the project the enemies had no pathfinding: each one probed a few directions ahead and steered round whatever was in the way. That holds up in an open arena and falls apart behind large cover and on split levels.
+
+Each arena is now cut into 0.8 m columns at load, with a node on every surface a body fits on and links only where an enemy can really walk or drop. One shortest-path field per kind of walker spreads out from the player's node, and every chaser of that kind reads it, so the cost doesn't grow with the wave. A field takes 2.7 ms at worst and is rebuilt at most five times a second. Enemies still chase directly when the straight line is walkable, and the old steering stays on top for avoiding each other.
+
+A test runs 2,243 chases across 41 arenas and sections: routes reach the player in 99.55% of them, against 92.2% for steering alone. The ten misses are spots where a column and the real boxes disagree. Bosses and flyers don't use routes, three places with moving or very wide ground have no grid, and an enemy still can't reach a ledge with no ramp.
 
 ### Climbing, and a time trial
 
@@ -397,6 +407,8 @@ The mixer has no SDL in it, so the tests render it offline and measure the resul
 
 A code review then caught the classic reverb bug. After a sound dies away, a feedback delay line decays toward zero but never reaches it: the values sink into **denormal floats**, where multiplying by the feedback rounds back to the same number. Apple Silicon handles denormals at full speed, so nothing showed up on my laptop, but on many x86 CPUs they're many times slower, and WebAssembly can't switch them off. The filters now flush anything below 10⁻¹⁵ to zero, and a test renders a minute of silence after a sound and counts the denormals left in the reverb: zero.
 
+Places have sources too. Lava, the Core's reactor, fans and pools of water each sound from their own spot, read off the level data, so you can walk toward the lava and hear it get closer. The sounds are built in code at load and add nothing to the download.
+
 ### Enemies you can hear coming
 
 Until recently every enemy made the same sound: one shared beep when any of them wound up an attack. Now every enemy type has its own voice, in the game's "dark machine" style: a machine body (servos, hydraulics, gear grind, treads, rattling chains) carrying a hollow choir of synthesized vowels.
@@ -463,6 +475,7 @@ On desktop the game logs what hurts you and what kills you, so the tuning can co
 - **Shots that sound like they're somewhere.** Each shot probes the walls around you, and the nearest three send it back from their own side, delayed by the time sound takes to get there and back. A corridor slaps and an open yard barely answers. Rounds spark where they hit, brass lands at your feet, enemy shots whizz past your head.
 - **Each arena has its own air.** Under the music, every arena and room has a background sound synthesized live: birds that give way to cicadas at nightfall, a furnace with distant clanks, running water and a pump's beat, a clock in the Orrery, something breathing in the Maw.
 - **Light and contact.** The neon and lava light whatever is near them (the 8 nearest lights each frame, faded so none pops in), and anything standing on a surface darkens where it meets it. On an M2 Air at 1440p, the textures, lights, shadows and room tone together cost about 0.6 ms a frame.
+- **Rooms that remember the fight.** A round leaves a pit where it stopped, a blast leaves soot on the floor, and spent brass lies where it fell, all capped and fading out after a while. A blast also makes the neon near it stutter for most of a second, shakes dust off a ceiling and throws up nearby lava; with reduced flashing on, the tubes dip once instead.
 - **The revolver became a hand cannon**: a slab-sided magnum with a heat gauge and etched glyphs that glow on a slow breath, quickening as you fire, and a heavier shot. Its wall echoes had been replaying the dry shot a few milliseconds late, which comb-filtered into a hollow tone, so its walls now send back a darkened, smeared echo instead.
 
 ### No way out of bounds
