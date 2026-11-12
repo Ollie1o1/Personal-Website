@@ -2,7 +2,7 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Five Story chapters, two arena acts and an encore, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
+summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Five Story chapters and the opening of a sixth, two arena acts and an encore, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
 description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Five Story chapters from a robot factory to a frozen planetary archive, Quake-style movement, distinct bosses, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Nov 2026'
@@ -12,9 +12,9 @@ demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
   - { k: 'Story chapters', v: '5' }
-  - { k: 'Story starts', v: '46' }
+  - { k: 'Story starts', v: '51' }
   - { k: 'Lines of C++', v: '60,000' }
-asOf: '2026-11-11'
+asOf: '2026-11-12'
 ---
 
 <OverdrivePlayer />
@@ -30,7 +30,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 | At a glance | |
 | --- | --- |
 | Modes | Arena, Story, Fast (time trial), Endless, Boss, Act II and combat practice |
-| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and five Story chapters with 46 developer starts |
+| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and six Story chapters (the sixth in progress) with 51 developer starts |
 | Enemies | Regular enemies, three Hollowed variants, six Gauntlet mini-bosses, and distinct Story and arena bosses |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, Oathbreaker, SPLINTER and RECALL |
 | Sound | Positional effects, synthesized enemy voices and live music |
@@ -44,7 +44,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 ### Modes and campaigns
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
-- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN**, **THE LIVING WARD**, **THE BLOOD MOON PLAIN** and **THE COLD STORE**. Escape a working factory, cross a failed evacuation route, descend through impossible medical wards, climb and enter a scrap titan, then reach a frozen archive where restored copies of you are kept. Equipment carries forward, with the grapple, Oathbreaker, SPLINTER and RECALL expanding how you fight. All five chapters are playable from the Story menu.
+- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN**, **THE LIVING WARD**, **THE BLOOD MOON PLAIN** and **THE COLD STORE**. Escape a working factory, cross a failed evacuation route, descend through impossible medical wards, climb and enter a scrap titan, then reach a frozen archive where restored copies of you are kept. Equipment carries forward, with the grapple, Oathbreaker, SPLINTER and RECALL expanding how you fight. All five chapters are playable from the Story menu, along with the first three places of a sixth, **THE KEPT RING**.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die. Share a challenge code to play the same wave sequence and difficulty; pause during a run to see its code and press **F8** to copy it. Seeded challenges are separate from the ordinary leaderboard.
 - **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard. **P / controller X** selects phase practice for the Sovereign, Sorter, Ballast and Successor; **R / controller Y** starts a six-fight boss rush with one life, carried upgrades and 25 health restored between fights. Rush times have their own local bests.
@@ -122,6 +122,10 @@ Chapter 5 reaches an ice shelf beneath a ringed planet, with frozen giants on th
 The Blast Chillers combine freezing vents with connected service roofs, walking ramps, broader machinery cover and sheltered flanks. Gaps between towers now drop into the Void, with recovery on the last safe deck you reached. Across the Frozen Sea, a lit relay shelter breaks the quiet walk toward DISPATCH 2. There, **24-K**, your restored factory copy, fights among cargo islands beneath a loading balcony, canopy and signal gantry.
 
 Beyond it waits **the Restorer**, whose attacks rewind your position, restore its own damage and shelve your weapons until you break them free. Low cryo screens offer cover around the Vault's rim while its central shelving field stays open. Freeze warnings remain visible on cover tops, and rewinds check for clear ground after the boss changes the layout.
+
+### Story: The Kept Ring (in progress)
+
+Chapter 6 lands UNIT 24 on a planetary ring in low gravity: a field of dispatch capsules, lanes of drifting chunks over nothing, and a reef of fused capsules. Every so often a far-off machine pulses and a wall of lifted ice crosses the ring. A red corner countdown is the time until the visible wall reaches you, so the number and the wall cannot disagree; get into the shadow of something heavy, marked by its lit mooring post, or be thrown off. HOLDFAST, a mag-spike on a line, holds you to a surface or pins a small enemy. Of its four new enemies, three work with the sweep: one runs for your shelter, one shoves loose shelter out of line, and one makes the sweeps come twice as often while it stands. Three of the chapter's eight planned places are built.
 
 ### Checkpoints, practice and atmosphere
 
@@ -526,7 +530,7 @@ Before putting the game in front of people I read it end to end and wrote the fi
 
 ## Results
 
-- **Playable campaigns and challenges:** five Story chapters with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
+- **Playable campaigns and challenges:** five Story chapters and part of a sixth with local saves, two arena acts and an encore, a time trial, Endless and Boss modes, four difficulties, shared leaderboards, checkpoints, XP and weapon upgrades, style scoring, and settings that persist (FOV, sensitivity, frame rate up to 360 Hz or unlimited, graphics quality, ambient detail, full key rebinding, screen shake, reduced flashing and colour-blind boss tells).
 - **Gamepad support**, in the browser too.
 - **A soundtrack synthesized live** in the audio callback, with a track per area that builds from the tubes into each fight and boss themes that trade techno, drum and bass and hardstyle sections without dropping the tempo, every track held to a measured loudness target, plus gunshots built from CC0 recordings with a synthesized thump and ring under each, held to their recordings' body and brightness by a test.
 - **Consistent movement across refresh rates**, from 60 Hz to unlimited.
