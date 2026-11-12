@@ -141,15 +141,14 @@ Wind, drifting ash, falling grit, vent emissions and loose machinery give the ro
 
 ### Act II
 
-You fall through five arenas, each built around one idea:
+You fall through four arenas, each built around one idea:
 
 1. **The Nave**, a flooded cathedral. The water slows you on foot (slide to skim across it) and rises every wave until only the galleries stay dry.
 2. **The Orrery.** Two rings of platforms turn over a captive sun whose flare sweeps the arena.
 3. **The Descent.** A cage rides down a vast shaft, stopping at a different floor for each wave, to a pit where **the Penitent** kneels, chained to the walls. Shoot out its six anchors or the chains, or grapple an anchor and rip it free. Jump its low censer sweeps, slide under the high ones. When the last chain breaks, it stands up and comes for you.
-4. **The Reliquary.** Pieces of the four Act I arenas, torn loose and drifting over a void, that regroup between waves: scattered, a ring, a stack you climb, then a path to a dark hole.
-5. **The Maw**, a cavern round a black pool where **the Leviathan** rises: a colossal plated serpent with an eclipse for an eye. It crashes its head down along a strip it burns into the floor, spits orbs you can parry back into its eye, and rolls tides over the ring. Hurt it and it hunts you from under the floor; near death the cavern floods and it tries to swallow you whole.
+4. **The Maw**, a cavern round a black pool where **the Leviathan** rises: a colossal plated serpent with an eclipse for an eye. It crashes its head down along a strip it burns into the floor, spits orbs you can parry back into its eye, and rolls tides over the ring. Hurt it and it hunts you from under the floor; near death the cavern floods and it tries to swallow you whole.
 
-Act II brings its own enemies: a Revenant whose soul flees to another relic when it dies and comes back unless you catch it, a Weaver that strings snaring wires across the gaps you jump, a winged Seraph that sweeps a beam after you, an Anchor whose field stops you dashing or grappling, and **Hollowed** variants of the old ones (enraged, splitting in two when they die, or haloed against everything but a headshot or a parry).
+Act II brings its own enemies: a winged Seraph that sweeps a beam after you, an Anchor whose field stops you dashing or grappling, and **Hollowed** variants of the old ones (enraged, splitting in two when they die, or haloed against everything but a headshot or a parry).
 
 ### The encore: the Absolute
 
@@ -340,14 +339,6 @@ Then **the harness itself** turned out to be wrong. The scripted player found th
 
 With the harness fixed, the fight is judged over 25 runs that start a few metres apart instead of one. The solid player kills the Absolute in just under three minutes (the median), surviving about two fights in three, and MorningStar takes a little over three minutes more.
 
-### Islands that move
-
-The Reliquary is the first arena where the floor itself changes between waves. Each relic is a group of boxes driven together along an eased path (the same system that carries the Descent's cage), with a position for each wave, and the next wave waits until they've settled.
-
-The awkward part was making sure no glide runs one relic through another. With eight debris stones, which stone goes to which slot in the next arrangement decides whether their paths cross. A small search over all **40,320** assignments per glide picked collision-free ones, and a test now replays every glide and checks every box against every other.
-
-The test that checks you can't cheese the new enemies found something worse: every walking enemy stepped straight off its relic into the void within a few seconds. Their edge check treated anything near their own floor height as solid, and on a relic their floor *is* the relic's top, so open air looked as safe as stone. Over a void, enemies now only step where something is really under them.
-
 ### A colossus that couldn't touch you
 
 The Penitent's rules are all relative to the floor it stands on: a low sweep hits you if your feet are within a metre of that floor, its shockwaves hug it, and it lashes a chain at you if you perch more than 4 m above it. The tests built it standing on the pit's floor and every rule passed. In the game it was harmless.
@@ -500,7 +491,7 @@ The five enemies you meet most after the Husk followed: the Sentinel (a lanky sn
 
 The Juggernaut and the Shieldbearer came next. The Juggernaut is a steel-and-gold siege mech whose furnace core throbs, whose cannon arm heats as it charges a shell and whose gold hammer fist lights only while it winds up a smash; parried, it slumps forward with its core strobing. The Shieldbearer's tower shield got a joint of its own, so the file's shield is braced in front, drawn back for a bash and knocked aside when it's parried, exactly as the code rig moved it. What the shield blocks is decided by angle, not by its shape, so the new model couldn't change the fight. The exporter needed one more trick for them: the rings on the Juggernaut's cannon are set at an angle on its arm, so it now finds the joint a part keeps a fixed offset from across every state, rather than only the frame it was drawn from.
 
-Then the rest, bosses included: every enemy and boss model is a file now, from the Mite's 24 parts to the Absolute's 409. The Warden's heart is a reactor behind an iris of six plates that draw back when it vents, the shot that matters; the Leviathan's file holds its skull and jaw plus one plated body segment that the game lays along each stretch of its curving body, scaled to fit. Building them turned up three old rig bugs the new models would have shown off: the Penitent's right arm hung inside its robe, the Weaver's legs bent down through the floor, and the Anchor's hunch tipped its toes under it. Your own arms on the sword and the parrying gauntlet are a file too.
+Then the rest, bosses included: every enemy and boss model is a file now, from the Mite's 24 parts to the Absolute's 409. The Warden's heart is a reactor behind an iris of six plates that draw back when it vents, the shot that matters; the Leviathan's file holds its skull and jaw plus one plated body segment that the game lays along each stretch of its curving body, scaled to fit. Building them turned up old rig bugs the new models would have shown off: the Penitent's right arm hung inside its robe, and the Anchor's hunch tipped its toes under it. Your own arms on the sword and the parrying gauntlet are a file too.
 
 Two things followed from real models. Deaths now break a body at its joints: every part on one joint (an arm, a leg, the head) flies off as a single piece holding its shape, the way the killing blow went, instead of a 300-part boss bursting into 300 fragments. And the arenas are dressed with props made the same way (market stalls, crates, broken columns, girder and carved pillars, a town on the Sunset Yard's skyline): a box keeps its collision and the prop is drawn in its place, stretched to fit it exactly, baked into the static level mesh. A test holds every prop inside the box it dresses, so what you see is what you collide with. Pickups, enemy shots and the grapple's claw are files as well.
 
