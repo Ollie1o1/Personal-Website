@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OVERDRIVE</title>
-<meta name="overdrive-build" content="61f8420ac446">
+<meta name="overdrive-build" content="bc3b6396d4d5">
 <link rel="icon" href="data:,">
 <style>
   :root { color-scheme: dark; }
@@ -48,7 +48,7 @@
       <kbd>Esc</kbd> or <kbd>P</kbd> pause (click to recapture the mouse) ·
       fullscreen from the pause menu
     </span>
-    <span class="build">Build 61f8420ac446</span>
+    <span class="build">Build bc3b6396d4d5</span>
   </button>
 </div>
 <script>
@@ -60,7 +60,7 @@
 
   var Module = {
     canvas,
-    locateFile: (path, prefix) => `${prefix}${path}?v=61f8420ac446`,
+    locateFile: (path, prefix) => `${prefix}${path}?v=bc3b6396d4d5`,
     // ?play skips the main menu (same as ./shooter --play), ?fast starts the FAST
     // time trial, ?endless an ENDLESS run; ?arena=N starts at arena (or FAST section) N; ?dev opens the
     // dev level select
@@ -68,6 +68,7 @@
       const q = new URLSearchParams(location.search);
       const args = q.has('arena') ? ['--arena', q.get('arena')] : q.has('play') ? ['--play'] : [];
       if (q.has('story5')) args.push('--story5');
+      if (q.has('story6')) args.push('--story6');   // Chapter 6: THE KEPT RING (?story6&arena=10: the Shore)
       if (q.has('res')) args.push('--res', q.get('res')); // optional render resolution for previews/software GPU checks
       if (q.has('story4')) args.push('--story4');   // Chapter 4 (in progress): no menu entry yet
       if (q.has('splinter')) args.push('--splinter');
@@ -265,6 +266,6 @@
   document.addEventListener('keydown', start, true);
   document.addEventListener('pointerlockchange', () => { if (document.pointerLockElement) start(); });
 </script>
-<script async src="overdrive.js?v=61f8420ac446"></script>
+<script async src="overdrive.js?v=bc3b6396d4d5"></script>
 </body>
 </html>
