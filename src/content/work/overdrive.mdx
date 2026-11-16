@@ -2,8 +2,8 @@
 order: 2
 title: 'OVERDRIVE'
 category: 'GRAPHICS · C++'
-summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Five Story chapters and the opening of a sixth, two arena acts and an encore, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
-description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Five Story chapters from a robot factory to a frozen planetary archive, Quake-style movement, distinct bosses, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
+summary: 'A fast 3D shooter built from scratch in C++ and OpenGL. Six playable Story chapters, two arena acts and an encore, four guns and a sword, a time trial, shared leaderboards and live synthesized music. Play the latest build here in your browser.'
+description: 'Play OVERDRIVE, a C++17 and OpenGL shooter built without a game engine. Six Story chapters from a robot factory to a planetary ring and the Shepherd, Quake-style movement, distinct bosses, positional audio and a WebAssembly build. A case study of the renderer, combat, level design and tools.'
 role: 'Solo — design and implementation'
 timeline: 'Mar – Nov 2026'
 stack: ['C++17', 'OpenGL 3.3', 'GLSL', 'SDL2', 'WebAssembly']
@@ -11,10 +11,10 @@ repo: 'https://github.com/Ollie1o1/3d_shooter'
 demo: { label: 'Play it on this page', href: '#play' }
 stats:
   - { k: 'Physics rate', v: '60 Hz' }
-  - { k: 'Story chapters', v: '5' }
-  - { k: 'Story starts', v: '55' }
+  - { k: 'Story chapters', v: '6' }
+  - { k: 'Shepherd movements', v: '3' }
   - { k: 'Lines of C++', v: '60,000' }
-asOf: '2026-11-12'
+asOf: '2026-11-16'
 ---
 
 <OverdrivePlayer />
@@ -30,7 +30,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 | At a glance | |
 | --- | --- |
 | Modes | Arena, Story, Fast (time trial), Endless, Boss, Act II and combat practice |
-| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and six Story chapters (the sixth in progress) with 56 developer starts |
+| Arenas | 5 in Act I, 5 in Act II, an encore, 7 time-trial rooms and six playable Story chapters |
 | Enemies | Regular enemies, three Hollowed variants, six Gauntlet mini-bosses, and distinct Story and arena bosses |
 | Weapons | Revolver, pump shotgun, bolt rifle, heavy sniper rifle, Oathbreaker, SPLINTER and RECALL |
 | Sound | Positional effects, synthesized enemy voices and live music |
@@ -44,7 +44,7 @@ I built it to learn what an engine actually does for you. The answer turned out 
 ### Modes and campaigns
 
 - **Arena** runs four arenas (a sunset yard, a foundry with lava channels, a tower you have to climb, and a night-time reactor) of three waves each, then a boss, then the Sanctum: a huge arena under an eclipse where you duel the final boss, a sword-wielding knight.
-- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN**, **THE LIVING WARD**, **THE BLOOD MOON PLAIN** and **THE COLD STORE**. Escape a working factory, cross a failed evacuation route, descend through impossible medical wards, climb and enter a scrap titan, then reach a frozen archive where restored copies of you are kept. Equipment carries forward, with the grapple, Oathbreaker, SPLINTER and RECALL expanding how you fight. All five chapters are playable from the Story menu, along with all eight places of a sixth, **THE KEPT RING**, and the first three of its boss's five phases.
+- **Story** follows UNIT 24, a rejected robot looking for its creator, through **THE CRADLE**, **THE DEAD SPAN**, **THE LIVING WARD**, **THE BLOOD MOON PLAIN** and **THE COLD STORE**. Escape a working factory, cross a failed evacuation route, descend through impossible medical wards, climb and enter a scrap titan, then reach a frozen archive where restored copies of you are kept. Equipment carries forward, with the grapple, Oathbreaker, SPLINTER and RECALL expanding how you fight. All six chapters are playable from the Story menu. **THE KEPT RING** continues through the Shepherd's interior, ascent, three-movement boss fight and capsule ending.
 - **Fast** is the Gauntlet, a time trial through seven rooms joined by boost tubes that fire you along at 26 m/s, a mini-boss in each room and a final boss racing you to the beacon, with a run clock, splits against your best run, par ranks, medals for every room, and ROOM ATTACK for any one room on its own.
 - **Endless** throws generated waves at you in the reactor until you die. Share a challenge code to play the same wave sequence and difficulty; pause during a run to see its code and press **F8** to copy it. Seeded challenges are separate from the ordinary leaderboard.
 - **Boss** offers ten fights across Arena, Fast and Story, including the Pacemaker, Sorter, Ballast and Successor, with upgrades to match and local best kill times. The Absolute’s two forms have separate entries. The original six fights also support the shared boss leaderboard. **P / controller X** selects phase practice for the Sovereign, Sorter, Ballast and Successor; **R / controller Y** starts a six-fight boss rush with one life, carried upgrades and 25 health restored between fights. Rush times have their own local bests.
@@ -123,9 +123,20 @@ The Blast Chillers combine freezing vents with connected service roofs, walking 
 
 Beyond it waits **the Restorer**, whose attacks rewind your position, restore its own damage and shelve your weapons until you break them free. Low cryo screens offer cover around the Vault's rim while its central shelving field stays open. Freeze warnings remain visible on cover tops, and rewinds check for clear ground after the boss changes the layout.
 
-### Story: The Kept Ring (in progress)
+### Story: The Kept Ring
 
-Chapter 6 lands UNIT 24 on a planetary ring in low gravity: a field of dispatch capsules, lanes of drifting chunks over nothing, and a reef of fused capsules. Every so often a far-off machine pulses and a wall of lifted ice crosses the ring. A red corner countdown is the time until the visible wall reaches you, so the number and the wall cannot disagree; get into the shadow of something heavy, marked by its lit mooring post, or be thrown off. HOLDFAST, a mag-spike on a line, holds you to a surface or pins a small enemy. Of its four new enemies, three work with the sweep: one runs for your shelter, one shoves loose shelter out of line, and one makes the sweeps come twice as often while it stands. The reef brings in **the Crook**, the first of the boss's three sheepdogs: it hooks a stray out of the reef, then throws its hook for you, white as it lands so you can parry it, and drags you out of your shelter unless HOLDFAST holds you. Hurt it enough and it breaks off toward the boss. Past the reef, the gas giant's shadow crosses the ring: the Shadow Band is lit only by your lamp, the lamps of fallen capsules and silent lightning on the giant's night side, so the sweep has to be read from its countdown and the lit posts, and it ends with the sun clearing the giant's edge. Beyond it, the Spokes are streaks of charged dust lying across the ring: inside one, dash and grapple stop working, so shelter has to be walked to and each streak is crossed where it narrows. Then the ring simply stops: the Gap is 480 m of nothing, crossed on a raft of ring ice while a sweep comes mid-crossing and **the Drover**, the second sheepdog, sends chunks of its herd sliding across the raft. Past it, the boss's gravity has pulled the ring up into a frozen wave: the Wake is climbed in terraces, sheltering against each step through a double sweep, to a summit that is the first view back over the whole crossing, where **the Bellwether** rings rings of force along the ground. The last place, the Shore, is the walk-up: down the wave's back into the boss's own shadow, where the light goes as its disc covers the sun, gravity returns to full and the sweeps give six seconds' warning and shatter small shelter. Overhead, the giant's main rings open into an arch as you near it. At its foot the boss, **the Shepherd**, a machine moon kilometres across, is its own level. In the Comb you walk one of its tines from tip to root through three places, each with a sheepdog back at full strength: the Plough, where the tip tears through a field of capsules and throws them onto the deck as cover while the Crook hooks from a mast until a parry yanks it down; the Stampede, where the tine breaks up behind you plate by plate while the Drover rolls its herd down the deck at you and the Shepherd's other teeth grind across it; and the Belfry, a tower of hanging bells where you shoot the chains to drop them on the Bellwether while the Shepherd tolls its great bell. In the Turn it rolls over to face you, the whole sky swinging round it, and after each wave off its ridge three vents stand open for a few seconds. Inside, in the Resonator, its blasts run down a hall of tower-sized tuning forks whose cores open after each one, to be shot out; then a quiet room where every capsule is counted, and a shaft climbed by grapple while blasts rise up it. Three of its five phases are built; the Break and the Fall are next.
+Chapter 6 lands UNIT 24 on a planetary ring in low gravity. Cross a field of dispatch capsules, drifting ice, a reef of fused hulls, the gas giant's shadow and a gap crossed on a moving raft. A distant machine sends walls of lifted ice across the ring. Their visible fronts and countdown share one clock: shelter behind something heavy or be swept off. **HOLDFAST**, a mag-spike on a line, anchors you to the hull or pins a small enemy. The Crook, Drover and Bellwether each contest a different part of the crossing before returning on the Shepherd itself.
+
+**The Shepherd** is a machine moon and a level. Fight along its teeth, bring down hanging bells, break its exposed vents and tuning forks, pass through a quiet capsule ledger and climb its lamp well. The final ascent has three different goals: bait a strike onto a mooring or spike its core to call one; hold a moving relay steady with HOLDFAST while guards contest it; then board a drifting chunk under fire.
+
+At the crown, the machine rises into an articulated human body over a broad combat court. Ramp-connected terraces and galleries flank a clear heart lane, with a capsule dock and orbital arch distinguishing the sides. The body remains vulnerable while its fists, arm sweeps, grabs, locked gaze, remembered positions and orbital volleys demand different movements. Parry a white fist or pin a grounded palm: its captive mass arcs into the heart, landing a visible counterweight hit and opening a stronger damage window. Close punishment restores more health than distant fire. Each health-third break scars the chest, releases capsules and throws a clamp clear to open another crossover. A retry resumes the current third.
+
+The original **COUNTERWEIGHT** score keeps a 174 BPM pulse through five adaptive arrangements: ascent, control, resistance, collapse and the last count. Phase changes take effect on a bar boundary while attack cues follow the simulation immediately. Eighteen sound families distinguish wind-ups, locks, parry windows, pin tension, heart impacts and the internal detonation. The final HOLDFAST seals the core before its last count expires; the blast happens inside, and the ending drifts into quiet on UNIT 24's unsent capsule.
+
+<figure>
+  <img src="/work/overdrive-shepherd.jpg" width="1280" height="720" alt="The Shepherd towers above the crown court, with its dark plated body and bright eyes above a clear route between brass orbital inlays." loading="lazy" decoding="async" style="width: 100%; height: auto;" />
+  <figcaption>The Shepherd's crown court. Ground a palm, turn its orbit into a counterweight, and open the heart.</figcaption>
+</figure>
 
 ### Checkpoints, practice and atmosphere
 
